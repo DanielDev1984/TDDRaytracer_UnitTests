@@ -1,0 +1,615 @@
+#include "pch.h"
+#include "CppUnitTest.h"
+#include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\ArithmeticStructures.h"
+#include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\Canvas.h"
+#include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\PPMWriter.h"
+#include <fstream>
+#include <filesystem>
+#include <array>
+
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+namespace TDDRaytracerUnitTests
+{
+	TEST_CLASS(TDDRaytracerUnitTests)
+	{
+	public:
+		
+		TEST_METHOD(ArithmeticStructures_IsVectorTest)
+		{
+			ArithmeticStructures aS;
+			aS.setVector(1.3, 2.3, -4.0);
+			
+			constexpr float expectedWPoint{ 0.0 };
+			const auto &[x,y,z,w] = aS.getVector();
+
+			Assert::AreEqual(expectedWPoint, w, 0.0001f, L"Vectors homogeneous coordinate must be 0.0");
+		}
+
+		TEST_METHOD(ArithmeticStructures_IsPointTest)
+		{
+			ArithmeticStructures aS;
+			aS.setPoint(1.3, 2.3, -4.0);
+
+			constexpr float expectedWVector{ 1.0 };
+			const auto& [x, y, z, w] = aS.getPoint();
+
+			Assert::AreEqual(expectedWVector, w, 0.0001f, L"Points homogeneous coordinate must be 1.0");
+		}
+
+		TEST_METHOD(ArithmeticStructures_EqualityTest)
+		{
+			ArithmeticStructures aS1;
+			aS1.setPoint(1.3, 2.3, -4.0);
+			aS1.setVector(1.3, 2.3, -4.0);
+			ArithmeticStructures aS2;
+			aS2.setPoint(1.3, 2.3, -4.0);
+			aS2.setVector(1.3, 2.3, -4.0);
+
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(aS1.getPoint(), aS2.getPoint()));
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(aS1.getVector(), aS2.getVector()));
+
+			Assert::IsFalse(ArithmeticStructures::coordinatesAreEqual(aS1.getVector(), aS2.getPoint()));
+			
+		}
+
+		TEST_METHOD(ArithmeticStructures_AddCoordinatesTest)
+		{
+			ArithmeticStructures aS1;
+			aS1.setPoint(1.0, 1.0, 1.0);
+			aS1.setVector(1.0, 1.0, 1.0);
+			ArithmeticStructures aS2;
+			aS2.setPoint(1.0, 1.0, 1.0);
+			aS2.setVector(1.0, 1.0, 1.0);
+			ArithmeticStructures expectedAS;
+			expectedAS.setPoint(2.0, 2.0, 2.0);
+			expectedAS.setVector(2.0, 2.0, 2.0);
+
+			// point + vector results in point (w == 1)
+			ArithmeticStructures::HomogenousCoordinates sumOfCoordinatesIsPoint{ ArithmeticStructures::addCoordinates(aS1.getPoint(), aS2.getVector()) };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(sumOfCoordinatesIsPoint, expectedAS.getPoint()));
+
+			// vector + vector results in vector (w == 0)
+			ArithmeticStructures::HomogenousCoordinates sumOfCoordinatesIsVector{ ArithmeticStructures::addCoordinates(aS1.getVector(), aS2.getVector()) };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(sumOfCoordinatesIsVector, expectedAS.getVector()));
+
+		}
+
+		TEST_METHOD(ArithmeticStructures_MultiplyScalarTest)
+		{
+			constexpr float s{ 2.0 };
+			ArithmeticStructures aS;
+			aS.setVector( 1.0,0.0,0.0 );
+			aS.setPoint(0.2, 0.3, 0.4);
+			ArithmeticStructures expectedValue;
+			expectedValue.setVector(2.0, 0.0, 0.0);
+			expectedValue.setPoint(0.4, 0.6, 0.8);
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(ArithmeticStructures::multiplyWithScalar(aS.getVector(), s), expectedValue.getVector()));
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(ArithmeticStructures::multiplyWithScalar(aS.getPoint(), s), expectedValue.getPoint()));
+		}
+
+		TEST_METHOD(ArithmeticStructures_MultiplyVectorTest)
+		{
+			ArithmeticStructures aS1;
+			aS1.setVector(1.0, 0.2, 0.4);
+			ArithmeticStructures aS2;
+			aS2.setVector(0.9, 1.0, 0.1);
+			ArithmeticStructures expectedValue;
+			expectedValue.setVector(0.9, 0.2, 0.04);
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(ArithmeticStructures::multiplyWithVector(aS1.getVector(), aS2.getVector()), expectedValue.getVector()));
+		}
+
+		TEST_METHOD(ArithmeticStructure_MagnitudeTest)
+		{
+			ArithmeticStructures aS;
+			aS.setPoint(1.3, 2.3, -4.0);
+			aS.setVector(1.0, 0.0, 0.0);
+
+			constexpr float epsilon{ 0.0001 };
+			float expectedMagnitude{ 1.0 };
+
+			Assert::AreEqual(expectedMagnitude, aS.magnitude(), epsilon);
+			aS.setVector(0.0, 1.0, 0.0);
+			Assert::AreEqual(expectedMagnitude, aS.magnitude(), epsilon);
+
+			expectedMagnitude = sqrtf(14);
+			aS.setVector(1.0, 2.0, 3.0);
+			Assert::AreEqual(expectedMagnitude, aS.magnitude(), epsilon);
+
+			aS.setVector(-1.0, 2.0,-3.0);
+			Assert::AreEqual(expectedMagnitude, aS.magnitude(), epsilon);
+
+		}
+
+		TEST_METHOD(ArithmeticStructure_NormalizationTest)
+		{
+			ArithmeticStructures aS;
+			aS.setVector(1.3, 2.3, -4.0);
+
+			constexpr float epsilon{ 0.0001 };
+			constexpr float expectedMagnitude{ 1.0 };
+
+			const auto [x, y, z, w] = aS.getNormalizedVector();
+
+			 ArithmeticStructures n;
+			 n.setVector(x, y, z);
+
+			Assert::AreEqual(expectedMagnitude, n.magnitude(), epsilon);
+
+		}
+
+		TEST_METHOD(ArithmeticStructure_DotProductTest)
+		{
+			ArithmeticStructures aS1;
+			aS1.setVector(1.0, 2.0, 3.0);
+
+			ArithmeticStructures aS2;
+			aS2.setVector(2.0, 3.0, 4.0);
+
+			constexpr float epsilon{ 0.0001 };
+			constexpr float expectedValue{ 20.0 };
+
+
+			Assert::AreEqual(expectedValue, ArithmeticStructures::dotProduct(aS1.getVector(), aS2.getVector()), epsilon);
+
+		}
+
+		TEST_METHOD(ArithmeticStructure_CrossProductTest)
+		{
+			ArithmeticStructures aS1;
+			aS1.setVector(1.0, 2.0, 3.0);
+
+			ArithmeticStructures aS2;
+			aS2.setVector(2.0, 3.0, 4.0);
+
+			ArithmeticStructures expectedValue;
+			expectedValue.setVector(-1.0, 2.0, -1.0);
+
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedValue.getVector(), ArithmeticStructures::crossProduct(aS1.getVector(), aS2.getVector())));
+
+			expectedValue.setVector(1.0, -2.0, 1.0);
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedValue.getVector(), ArithmeticStructures::crossProduct(aS2.getVector(), aS1.getVector())));
+		}
+
+		TEST_METHOD(ArithmeticStructure_MatrixTypeTest)
+		{
+			ArithmeticStructures::row2x2 m0_2x2{ {0.0, 0.0} }, m1_2x2{ {0.0, 0.0} };
+			ArithmeticStructures::Matrix2x2 m22{m0_2x2, m1_2x2};
+			Assert::IsTrue(ArithmeticStructures::MatrixType::Matrix2x2 == m22.getType());
+
+			ArithmeticStructures::row3x3 m0_3x3{ {0.0, 0.0, 0.0} }, m1_3x3{ {0.0, 0.0, 0.0} }, m2_3x3{ {0.0,0.0,0.0} };
+			ArithmeticStructures::Matrix3x3 m33{ m0_3x3, m1_3x3, m2_3x3 };
+			Assert::IsTrue(ArithmeticStructures::MatrixType::Matrix3x3 == m33.getType());
+
+			ArithmeticStructures::row4x4 m0_4x4{ {0.0,0.0, 0.0, 0.0} }, m1_4x4{ {0.0, 0.0, 0.0, 0.0} }, m2_4x4{ {0.0, 0.0,0.0,0.0} }, m3_4x4{ {0.0,0.0,0.0,0.0} };
+			ArithmeticStructures::Matrix4x4 m44{m0_4x4, m1_4x4, m2_4x4, m3_4x4};
+			Assert::IsTrue(ArithmeticStructures::MatrixType::Matrix4x4 == m44.getType());
+		}
+
+		TEST_METHOD(ArithmeticStructure_MatrixSizeTest)
+		{
+			ArithmeticStructures::row2x2 m0_2x2{ {0.0, 0.0} }, m1_2x2{ {0.0, 0.0} };
+			ArithmeticStructures::Matrix2x2 m22{ m0_2x2, m1_2x2 };
+			Assert::AreEqual(4, m22.getMatrixSize());
+
+			ArithmeticStructures::row3x3 m0_3x3{ {0.0, 0.0, 0.0} }, m1_3x3{ {0.0, 0.0, 0.0} }, m2_3x3{ {0.0,0.0,0.0} };
+			ArithmeticStructures::Matrix3x3 m33{ m0_3x3, m1_3x3, m2_3x3 };
+			Assert::AreEqual(9, m33.getMatrixSize());
+
+			ArithmeticStructures::row4x4 m0_4x4{ {0.0, 0.0, 0.0, 0.0} }, m1_4x4{ {0.0, 0.0, 0.0, 0.0} }, m2_4x4{ {0.0,0.0,0.0, 0.0} }, m3_4x4{ {0.0,0.0,0.0,0.0} };
+			ArithmeticStructures::Matrix4x4 m44{ m0_4x4, m1_4x4, m2_4x4, m3_4x4 };
+			Assert::AreEqual(16, m44.getMatrixSize());
+		}
+
+		TEST_METHOD(ArithmeticStructure_MatrixComparisonTest)
+		{
+			ArithmeticStructures::row2x2 m0_2x2{ {0.0, 1.0} }, m1_2x2{ {0.0, 0.0} };
+			ArithmeticStructures::Matrix2x2 matrix1_2x2{ m0_2x2, m1_2x2 }, matrix2_2x2{ m0_2x2, m1_2x2 };
+			// detect when matrices are equal
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_2x2(matrix1_2x2, matrix2_2x2));
+			// detect when matrices are not equal
+			matrix2_2x2.setMatrixData(1, ArithmeticStructures::row2x2{ 3.0,0.0 });
+			Assert::IsFalse(ArithmeticStructures::matricesAreEqual_2x2(matrix1_2x2, matrix2_2x2));
+
+			ArithmeticStructures::row3x3 m0_3x3{ { 0.0, 3.0, 0.0} }, m1_3x3{ { 0.0, 0.0, 0.0} }, m2_3x3{ {0.0,0.0, 0.0}  };
+			ArithmeticStructures::Matrix3x3 matrix1_3x3{ m0_3x3, m1_3x3, m2_3x3}, matrix2_3x3{ m0_3x3, m1_3x3, m2_3x3 };
+			// detect when matrices are equal
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_3x3(matrix1_3x3, matrix2_3x3));
+			// detect when matrices are not equal
+			matrix2_3x3.setMatrixData(1, ArithmeticStructures::row3x3{ 3.0,0.0,0.0 });
+			Assert::IsFalse(ArithmeticStructures::matricesAreEqual_3x3(matrix1_3x3, matrix2_3x3));
+
+			ArithmeticStructures::row4x4 m0_4x4{ {0.0, 0.0, 0.0, 0.0} }, m1_4x4{ {0.0, 0.0, 0.0, 0.0} }, m2_4x4{ {0.0,0.0,0.0, 0.0} }, m3_4x4{ {0.0,0.0,0.0,0.0} };
+			ArithmeticStructures::Matrix4x4 matrix1_4x4{ m0_4x4, m1_4x4, m2_4x4, m3_4x4 }, matrix2_4x4{ m0_4x4, m1_4x4, m2_4x4, m3_4x4 };
+			// detect when matrices are equal
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(matrix1_4x4, matrix2_4x4));
+			// detect when matrices are not equal
+			matrix2_4x4.setMatrixData(1, ArithmeticStructures::row4x4{ 3.0,0.0,0.0,0.0 });
+			Assert::IsFalse(ArithmeticStructures::matricesAreEqual_4x4(matrix1_4x4, matrix2_4x4));
+
+		}
+
+		TEST_METHOD(ArithmeticStructure_MatrixValuesTest)
+		{
+			constexpr float expectedValue{ 1.0 };
+			ArithmeticStructures::row2x2 m0_2x2{ {0.0, expectedValue} }, m1_2x2{ {0.0, 0.0} };
+			ArithmeticStructures::Matrix2x2 m2x2{ m0_2x2, m1_2x2 };
+			Assert::AreEqual(expectedValue, m2x2.getElement(0, 1));
+
+
+			ArithmeticStructures::row3x3 m0_3x3{ { 0.0, 3.0, 0.0} }, m1_3x3{ { 0.0, expectedValue, 0.0} }, m2_3x3{ {0.0,0.0, 0.0} };
+			ArithmeticStructures::Matrix3x3 m3x3{ m0_3x3, m1_3x3, m2_3x3 };
+			Assert::AreEqual(expectedValue, m3x3.getElement(1, 1));
+
+			ArithmeticStructures::row4x4 m0_4x4{ {0.0, 0.0, 0.0, 0.0} }, m1_4x4{ {0.0, 0.0, 0.0, 0.0} }, m2_4x4{ {0.0,0.0,0.0, 0.0} }, m3_4x4{ {0.0,0.0,expectedValue,0.0} };
+			ArithmeticStructures::Matrix4x4 m4x4{ m0_4x4, m1_4x4, m2_4x4, m3_4x4 };
+			Assert::AreEqual(expectedValue, m4x4.getElement(3, 2));
+		}
+
+		TEST_METHOD(ArithmeticStructure_MatrixMatrixMultiplicationTest)
+		{
+			// test matrix X matrix multiplication
+			// values for matrix1
+			ArithmeticStructures::row4x4 m0_4x4_1{ {1.0, 2.0, 3.0, 4.0} }, m1_4x4_1{ {5.0, 6.0, 7.0, 8.0} }, m2_4x4_1{ {9.0,8.0,7.0, 6.0} }, m3_4x4_1{ {5.0,4.0,3.0,2.0} };
+			// values for matrix2
+			ArithmeticStructures::row4x4 m0_4x4_2{ {-2.0, 1.0, 2.0, 3.0} }, m1_4x4_2{ {3.0, 2.0, 1.0, -1.0} }, m2_4x4_2{ {4.0,3.0,6.0, 5.0} }, m3_4x4_2{ {1.0,2.0,7.0,8.0} };
+			// values for expected result
+			ArithmeticStructures::row4x4 m0_expected{ {20.0, 22.0, 50.0, 48.0} }, m1_expected{ {44.0, 54.0, 114.0, 108.0} }, m2_expected{ {40.0,58.0,110.0, 102.0} }, m3_expected{ {16.0,26.0,46.0,42.0} };
+			
+			ArithmeticStructures::Matrix4x4 
+				m1{ m0_4x4_1, m1_4x4_1, m2_4x4_1, m3_4x4_1 }, 
+				m2{ m0_4x4_2, m1_4x4_2, m2_4x4_2, m3_4x4_2 }, 
+				expectedResult{ m0_expected, m1_expected, m2_expected, m3_expected };
+			
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(expectedResult, ArithmeticStructures::multiplyMatrices(m1,m2)));
+
+			
+		}
+
+		TEST_METHOD(ArithmeticStructure_MatrixIdentityTest)
+		{
+			ArithmeticStructures::row4x4 m0{ {1.0, 2.0, 3.0, 4.0} }, m1{ {2.0, 4.0, 4.0, 2.0} }, m2{ {8.0,6.0,4.0, 1.0} }, m3{ {0.0,0.0,0.0,1.0} };
+			ArithmeticStructures::Matrix4x4 m{ m0, m1, m2, m3 };
+			ArithmeticStructures::Matrix4x4 expectedResult{ m.getRowM(0),m.getRowM(1),m.getRowM(2),m.getRowM(3) };
+
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(expectedResult, ArithmeticStructures::multiplyMatrices(m, ArithmeticStructures::getIdentityMatrix())));
+
+
+		}
+
+		TEST_METHOD(ArithmeticStructure_MatrixTranspositionTest)
+		{
+			ArithmeticStructures::row4x4 m0{ {0.0, 9.0, 3.0, 0.0} }, m1{ {9.0, 8.0, 0.0, 8.0} }, m2{ {1.0,8.0,5.0, 3.0} }, m3{ {0.0,0.0,5.0,8.0} };
+			ArithmeticStructures::Matrix4x4 m{ m0, m1, m2, m3 };
+			ArithmeticStructures::row4x4 expectedResult_m0{ {0.0, 9.0, 1.0, 0.0} }, expectedResult_m1{ {9.0, 8.0, 8.0, 0.0} }, expectedResult_m2{ {3.0,0.0,5.0, 5.0} }, expectedResult_m3{ {0.0,8.0,3.0,8.0} };
+			ArithmeticStructures::Matrix4x4 expectedResult{ expectedResult_m0 , expectedResult_m1,expectedResult_m2,expectedResult_m3 };
+
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(expectedResult, ArithmeticStructures::transposeMatrix(m)));
+
+			ArithmeticStructures::Matrix4x4 identiyt{ 
+				ArithmeticStructures::getIdentityMatrix().getRowM(0) , 
+				ArithmeticStructures::getIdentityMatrix().getRowM(1),
+				ArithmeticStructures::getIdentityMatrix().getRowM(2),
+				ArithmeticStructures::getIdentityMatrix().getRowM(3) };
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(ArithmeticStructures::getIdentityMatrix(), ArithmeticStructures::transposeMatrix(identiyt)));
+
+
+		}
+
+		TEST_METHOD(ArithmeticStructure_MatrixCalculateDeterminantTest)
+		{
+			ArithmeticStructures::row2x2 m0{ {1.0, 5.0} }, m1{ {-3.0, 2.0} };
+			ArithmeticStructures::Matrix2x2 m{ m0, m1};
+
+			float expectedValue{ 17 };
+
+			Assert::AreEqual(expectedValue, m.getDeterminant());
+
+			ArithmeticStructures::row3x3 m0_3x3{ {1.0, 2.0, 6.0} }, m1_3x3{ {-5.0, 8.0, -4.0} }, m2_3x3{ {2.0,6.0,4.0} };
+			ArithmeticStructures::Matrix3x3 m_3x3{ m0_3x3 , m1_3x3,m2_3x3 };
+			expectedValue = -196;
+
+			Assert::AreEqual(expectedValue, m_3x3.getDeterminant());
+
+			ArithmeticStructures::row4x4 m0_4x4{ {-2.0, -8.0, 3.0, 5.0} }, m1_4x4{ {-3.0, 1.0, 7.0, 3.0} }, m2_4x4{ {1.0,2.0,-9.0, 6.0} }, m3_4x4{ {-6.0,7.0,7.0,-9.0} };
+			ArithmeticStructures::Matrix4x4 m_4x4{ m0_4x4, m1_4x4, m2_4x4, m3_4x4 };
+			expectedValue = -4071;
+
+			Assert::AreEqual(expectedValue, m_4x4.getDeterminant());
+
+			
+		}
+
+		TEST_METHOD(ArithmeticStructure_MatrixIsInvertibleTest)
+		{
+			// this matrix is expected to be invertible
+			ArithmeticStructures::row4x4 m0_1{ {6.0, 4.0, 4.0, 4.0} }, m1_1{ {5.0, 5.0, 7.0, 6.0} }, m2_1{ {4.0,-9.0,3.0, -7.0} }, m3_1{ {9.0,1.0,7.0,-6.0} };
+			ArithmeticStructures::Matrix4x4 m_1{ m0_1, m1_1, m2_1, m3_1 };
+			Assert::IsTrue(m_1.isInvertible());
+
+			// this matrix is not expected to be invertible
+			ArithmeticStructures::row4x4 m0_2{ {-4.0, 2.0, -2.0, -3.0} }, m1_2{ {9.0, 6.0, 2.0, 6.0} }, m2_2{ {0.0,-5.0,1.0, -5.0} }, m3_2{ {0.0,0.0,0.0,0.0} };
+			ArithmeticStructures::Matrix4x4 m_2{ m0_2, m1_2, m2_2, m3_2 };
+			Assert::IsFalse(m_2.isInvertible());
+		}
+
+		TEST_METHOD(ArithmeticStructure_MatrixInverseTest)
+		{
+			// this matrix is expected to be invertible
+			ArithmeticStructures::row4x4 m0_1{ {-5.0, 2.0, 6.0, -8.0} }, m1_1{ {1.0, -5.0, 1.0, 8.0} }, m2_1{ {7.0,7.0,-6.0, -7.0} }, m3_1{ {1.0,-3.0,7.0,4.0} };
+			ArithmeticStructures::Matrix4x4 m{ m0_1, m1_1, m2_1, m3_1 };
+
+			ArithmeticStructures::row4x4 
+				m0_expected{ {0.21805, 0.45113, 0.24060, -0.04511} }, 
+				m1_expected{ {-0.80827, -1.45677, -0.44361, 0.52068} },
+				m2_expected{ {-0.07895,-0.22368,-0.05263, 0.19737} }, 
+				m3_expected{ {-0.52256,-0.81397,-0.30075,0.30639} };
+			ArithmeticStructures::Matrix4x4 expectedResult{ m0_expected, m1_expected, m2_expected, m3_expected };
+
+			ArithmeticStructures::inverseMatrix(m);
+
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(expectedResult, m));
+
+
+			// this matrix is not expected to be invertible, inversion doesnt change that matrix though
+			ArithmeticStructures::row4x4 m0_2{ {-4.0, 2.0, -2.0, -3.0} }, m1_2{ {9.0, 6.0, 2.0, 6.0} }, m2_2{ {0.0,-5.0,1.0, -5.0} }, m3_2{ {0.0,0.0,0.0,0.0} };
+			ArithmeticStructures::Matrix4x4 m_2{ m0_2, m1_2, m2_2, m3_2 };
+
+			ArithmeticStructures::inverseMatrix(m_2);
+
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(m_2, m_2));
+
+			// test whether multiplying with the inverse behaves as expected (i.e. A*B = C -> C* B^-1 = A
+			ArithmeticStructures::row4x4 m0_A{ {3.0, -9.0, 7.0, 3.0} }, m1_A{ {3.0, -8.0, 2.0, -9.0} }, m2_A{ {-4.0,4.0,4.0, 1.0} }, m3_A{ {-6.0,5.0,-1.0,1.0} };
+			ArithmeticStructures::Matrix4x4 m_A{ m0_A, m1_A, m2_A, m3_A };
+			ArithmeticStructures::row4x4 m0_B{ {8.0, 2.0, 2.0, 2.0} }, m1_B{ {3.0, -1.0, 7.0, 0.0} }, m2_B{ {7.0,0.0,5.0, 4.0} }, m3_B{ {6.0,-2.0,0.0,5.0} };
+			ArithmeticStructures::Matrix4x4 m_B{ m0_B, m1_B, m2_B, m3_B };
+
+			auto m_C{ ArithmeticStructures::multiplyMatrices(m_A,m_B) };
+			ArithmeticStructures::inverseMatrix(m_B);
+			auto multiplicationWithInverseResult{ ArithmeticStructures::multiplyMatrices(m_C,m_B) };
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(m_A, multiplicationWithInverseResult));
+		}
+
+		TEST_METHOD(ArithmeticStructure_MatrixCofactorMatrixTest)
+		{
+			// this matrix is expected to be invertible
+			ArithmeticStructures::row4x4 m0_1{ {-5.0, 2.0, 6.0, -8.0} }, m1_1{ {1.0, -5.0, 1.0, 8.0} }, m2_1{ {7.0,7.0,-6.0, -7.0} }, m3_1{ {1.0,-3.0,7.0,4.0} };
+			ArithmeticStructures::Matrix4x4 m{ m0_1, m1_1, m2_1, m3_1 };
+
+			ArithmeticStructures::row4x4
+				m0_2{ {116, -430, -42, -278} },
+				m1_2{ {240, -775, -119, -433} },
+				m2_2{ {128,-236,-28, -160} },
+				m3_2{ {-24,277,105,163} };
+			ArithmeticStructures::Matrix4x4 expectedResult{ m0_2, m1_2, m2_2, m3_2 };
+
+			
+
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(expectedResult, ArithmeticStructures::getCofactorMatrix(m)));
+		}
+
+
+		TEST_METHOD(ArithmeticStructure_MatrixSubmatrixTest)
+		{
+			ArithmeticStructures::row4x4 m0{ {-6.0, 1.0, 1.0, 6.0} }, m1{ {-8.0, 5.0, 8.0, 6.0} }, m2{ {-1.0,0.0,8.0, 2.0} }, m3{ {-7.0,1.0,-1.0,1.0} };
+			ArithmeticStructures::Matrix4x4 m{ m0, m1, m2, m3 };
+			ArithmeticStructures::row3x3 expectedResult_m0{ {-6.0, 1.0, 6.0} }, expectedResult_m1{ {-8.0, 8.0, 6.0} }, expectedResult_m2{ {-7.0,-1.0,1.0} };
+			ArithmeticStructures::Matrix3x3 expectedResult{ expectedResult_m0 , expectedResult_m1,expectedResult_m2};
+
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_3x3(expectedResult, ArithmeticStructures::getSubmatrixOf4x4Matrix(2,1,m)));
+
+
+
+			ArithmeticStructures::row3x3 m0_3x3{ {1.0, 5.0, 0.0} }, m1_3x3{ {-3.0, 2.0, 7.0} }, m2_3x3{ {0.0,6.0,-3.0} };
+			ArithmeticStructures::Matrix3x3 m_3x3{ m0_3x3, m1_3x3, m2_3x3};
+			ArithmeticStructures::row2x2 expectedResult_m0_3x3{ {-3.0, 2.0} }, expectedResult_m1_3x3{ {0.0, 6.0} };
+			ArithmeticStructures::Matrix2x2 expectedResult_3x3{ expectedResult_m0_3x3 , expectedResult_m1_3x3};
+
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_2x2(expectedResult_3x3, ArithmeticStructures::getSubmatrixOf3x3Matrix(0, 2, m_3x3)));
+		}
+
+		TEST_METHOD(ArithmeticStructure_MatrixMinorTest)
+		{
+
+			ArithmeticStructures::row3x3 m0_3x3{ {3.0, 5.0, 0.0} }, m1_3x3{ {2.0, -1.0, -7.0} }, m2_3x3{ {6.0,-1.0,5.0} };
+			ArithmeticStructures::Matrix3x3 m_3x3{ m0_3x3, m1_3x3, m2_3x3 };
+
+			constexpr float expectedResult{ 25.0 };
+			constexpr int subMatrixRow{ 1 }, subMatrixColumn{ 0 };
+			constexpr float epsilon{ 0.0001 };
+
+			Assert::AreEqual(expectedResult, ArithmeticStructures::getSubmatrixOf3x3Matrix(subMatrixRow, subMatrixColumn, m_3x3).getDeterminant(), epsilon);
+
+			Assert::AreEqual(  expectedResult, ArithmeticStructures::getMinor(subMatrixRow, subMatrixColumn, m_3x3), epsilon);
+		}
+
+		TEST_METHOD(ArithmeticStructure_MatrixCofactorTest)
+		{
+
+			ArithmeticStructures::row3x3 m0_3x3{ {3.0, 5.0, 0.0} }, m1_3x3{ {2.0, -1.0, -7.0} }, m2_3x3{ {6.0,-1.0,5.0} };
+			ArithmeticStructures::Matrix3x3 m_3x3{ m0_3x3, m1_3x3, m2_3x3 };
+
+			float expectedResult{ -25.0 };
+			int subMatrixRow{ 1 }, subMatrixColumn{ 0 };
+			constexpr float epsilon{ 0.0001 };
+
+			Assert::AreEqual(expectedResult, ArithmeticStructures::getCofactor(subMatrixRow, subMatrixColumn, m_3x3), epsilon);
+			subMatrixRow = 0; subMatrixColumn = 0;
+			expectedResult = -12.0;
+			Assert::AreEqual(expectedResult, ArithmeticStructures::getCofactor(subMatrixRow, subMatrixColumn, m_3x3), epsilon);
+		}
+
+		TEST_METHOD(ArithmeticStructure_MatrixTupleMultiplicationTest)
+		{
+			// test matrix X tuple multiplication
+			ArithmeticStructures::row4x4 m0{ {1.0, 2.0, 3.0, 4.0} }, m1{ {2.0, 4.0, 4.0, 2.0} }, m2{ {8.0,6.0,4.0, 1.0} }, m3{ {0.0,0.0,0.0,1.0} };
+			ArithmeticStructures::Matrix4x4 m{ m0, m1, m2, m3 };
+			ArithmeticStructures::HomogenousCoordinates c{ 1.0,2.0,3.0,1.0 };
+			ArithmeticStructures::HomogenousCoordinates expectedResult{18.0,24.0,33.0,1.0};
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedResult, ArithmeticStructures::multiplyMatrixWithTuple(m, c)));
+		}
+
+		TEST_METHOD(Canvas_DimTest)
+		{
+			constexpr int xDim{ 256 }, yDim{ 354 };
+			Canvas c(xDim, yDim);
+			Assert::AreEqual(xDim, c.getDimX());
+			Assert::AreEqual(yDim, c.getDimY());
+		}
+
+		TEST_METHOD(Canvas_SetImageDataTest)
+		{
+			constexpr int xDim{ 256 }, yDim{ 354 };
+			Canvas c(xDim, yDim);
+			ArithmeticStructures::HomogenousCoordinates imageData{ 1.0,0.0,0.0,1.0 };
+			Assert::IsTrue(c.setImageData(12, 3, imageData));
+			Assert::IsFalse(c.setImageData(345, 233, imageData));
+		}
+
+		TEST_METHOD(Canvas_GetImageDataTest)
+		{
+			constexpr int xDim{ 256 }, yDim{ 354 };
+			constexpr int xCoord{ 12 }, yCoord{ 34 };
+			const ArithmeticStructures::HomogenousCoordinates expectedColor{ 1.0,0.0,0.0,1.0 };
+			Canvas c(xDim, yDim);
+			c.setImageData(xCoord, yCoord, expectedColor);
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedColor, c.getImageData(xCoord, yCoord)));
+		}
+
+		TEST_METHOD(PPMWriter_CreatePPMFile)
+		{
+			
+			const std::string expectedFilename{ "unittest_filename.ppm" };
+			// make sure a file with the expectedFilename is not present before executing the test
+			std::ifstream istrm(expectedFilename, std::ios::binary);
+			Assert::IsTrue(!istrm.is_open(), L"there shouldnt be a file with the expected filename before executing the test");
+			istrm.close();
+
+			PPMWriter imageWriter{ 256, 256, expectedFilename };
+			imageWriter.createPPM(Canvas{ 0,0 });
+			istrm.open(expectedFilename, std::ios::binary);
+			Assert::IsTrue(istrm.is_open(), L"no file has been generated by the function under test");
+			// todo: if test fails, close file again
+			
+			istrm.close();
+			// cleanup folder after test
+			std::filesystem::remove(expectedFilename);
+
+			
+		}
+
+		TEST_METHOD(PPMWriter_CheckPPMFileMetaData)
+		{
+			const std::string createdFileName{ "createdFile.ppm" };
+			// make sure a file with the expectedFilename is not present before executing the test
+			std::ifstream createdFS(createdFileName, std::ios::binary);
+			Assert::IsFalse(createdFS.is_open(), L"there shouldnt be a file with the filename before executing the test");
+			createdFS.close();
+
+			const std::string expectedPPMFormat{ "P3" };
+			constexpr int expectedXDim{ 256 }, expectedYDim{ 256 };
+			constexpr int expectedColorDepth{ 255 };
+
+			PPMWriter imageWriter{ expectedXDim, expectedYDim, createdFileName };
+			imageWriter.createPPM(Canvas{ 0,0 });
+
+			std::string pPMFormatFromFile{ "" };
+			int xDimFromFile{ 0 }, yDimFromFile{ 0 }, colorDepthFromFile{ 0 };
+
+			createdFS.open(createdFileName, std::ios::binary);
+			createdFS >> pPMFormatFromFile;
+			createdFS >> xDimFromFile >> yDimFromFile;
+			createdFS >> colorDepthFromFile;
+
+			Assert::IsTrue(expectedPPMFormat == pPMFormatFromFile, L"read ppm format doesnt match expected ppm format");
+			Assert::IsTrue(expectedXDim == xDimFromFile, L"read XDim doesnt match expected xDim");
+			Assert::IsTrue(expectedYDim == yDimFromFile, L"read yDim doesnt match expected yDim");
+			Assert::IsTrue(expectedColorDepth == colorDepthFromFile, L"read colorDepth doesnt match expected colorDepth");
+			
+			createdFS.close();
+			// cleanup folder after test
+			std::filesystem::remove(createdFileName);
+		}
+
+		TEST_METHOD(PPMWriter_CheckPPMFileImageData)
+		{
+			const std::string createdFileName{ "createdFile.ppm" };
+			// make sure a file with the expectedFilename is not present before executing the test
+			std::ifstream createdFS(createdFileName, std::ios::binary);
+			Assert::IsFalse(createdFS.is_open(), L"there shouldnt be a file with the filename before executing the test");
+			createdFS.close();
+
+			constexpr int xDim{ 4 }, yDim{ 2 };
+
+			PPMWriter imageWriter{ xDim, yDim, createdFileName };
+			Canvas referenceCanvas(xDim, yDim);
+
+
+			for (auto x = 0; x < xDim; x++)
+			{
+				for (auto y = 0; y < yDim; y++)
+				{
+					referenceCanvas.setImageData(x, y, ArithmeticStructures::HomogenousCoordinates{ (int)(x*255.0/xDim),(int)0.0,(int)0.0,1.0 });
+				}
+			}
+
+			imageWriter.createPPM(referenceCanvas);
+
+			std::string pPMFormatFromFile{ "" };
+			int xDimFromFile{ 0 }, yDimFromFile{ 0 }, colorDepthFromFile{ 0 };
+
+			createdFS.open(createdFileName, std::ios::binary);
+			createdFS >> pPMFormatFromFile;
+			createdFS >> xDimFromFile >> yDimFromFile;
+			createdFS >> colorDepthFromFile;
+
+			int r, g, b;
+			std::array<std::array < std::array<int, 3>, 4>, 2> buffer{};
+
+			for (auto y = 0; y <yDim; y++)
+			{
+				for (auto x = 0; x < xDim; x++)
+				{
+					createdFS >> r;
+					createdFS >> g;
+					createdFS >> b;
+					buffer.at(y).at(x) = std::array<int, 3>{r, g, b};
+				}
+			}
+
+
+			for (auto y = 0; y < yDim; y++)
+			{
+				for (auto x = 0; x < xDim; x++)
+				{
+					auto [v1, v2, v3] = buffer.at(y).at(x);
+					
+					Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(referenceCanvas.getImageData(x, y), ArithmeticStructures::HomogenousCoordinates{ v1,v2,v3,1.0 }), L"the value read from the file doesnt match the expected value");
+				}
+			}
+			
+			
+
+			createdFS.close();
+
+			// cleanup folder after test
+			std::filesystem::remove(createdFileName);
+		}
+
+		/*TEST_METHOD(PPMWriter_CheckPPMDimensionDontMatchCanvasDimension)
+		{
+			Assert::Fail(L"test implementation needed, make sure a too large canvas cant be passed to the ppmwriter");
+		}*/
+
+
+
+		/*TEST_METHOD(PPMWriter_CheckPPMFileNameTooLong)
+		{
+			
+			Assert::Fail(L"this test needs proper implementation");
+		}*/
+	};
+
+	
+}
