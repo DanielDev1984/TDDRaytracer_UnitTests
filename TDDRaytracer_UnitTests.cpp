@@ -450,6 +450,26 @@ namespace TDDRaytracerUnitTests
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedResult, ArithmeticStructures::multiplyMatrixWithTuple(m, c)));
 		}
 
+		TEST_METHOD(ArithmeticStructure_MatrixTranslationTest)
+		{
+			constexpr float x{ 5.0 }, y{ -3.0 }, z{ 2 };
+
+			// is the transformation matrix created as expected
+			ArithmeticStructures::row4x4 m0_expected{ {1.0, 2.0, 3.0, 4.0} }, m1_expected{ {2.0, 4.0, 4.0, 2.0} }, m2_expected{ {8.0,6.0,4.0, 1.0} }, m3_expected{ {0.0,0.0,0.0,1.0} };
+			ArithmeticStructures::Matrix4x4 m_expected{ m0_expected, m1_expected, m2_expected, m3_expected };
+			const auto transformationMatrix{ ArithmeticStructures::getTranslationMatrix(x,y,z) };
+
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(m_expected, transformationMatrix));
+
+
+			// does translation work as expected
+			ArithmeticStructures::HomogenousCoordinates p{ -3.0,4.0,2.0,0.0 };
+
+			ArithmeticStructures::HomogenousCoordinates expected_p_afterTranslation{ 2.0,1.0,7.0,0.0 };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expected_p_afterTranslation, p));
+			
+		}
+
 		TEST_METHOD(Canvas_DimTest)
 		{
 			constexpr int xDim{ 256 }, yDim{ 354 };
