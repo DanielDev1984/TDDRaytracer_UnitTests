@@ -452,12 +452,12 @@ namespace TDDRaytracerUnitTests
 
 		TEST_METHOD(ArithmeticStructure_MatrixTranslationTest)
 		{
-			constexpr float x{ 5.0 }, y{ -3.0 }, z{ 2 };
+			constexpr float shift_x{ 5.0 }, shift_y{ -3.0 }, shift_z{ 2 };
 
 			// is the transformation matrix created as expected
-			ArithmeticStructures::row4x4 m0_expected{ {1.0, 0.0, 0.0, x} }, m1_expected{ {0.0, 1.0, 0.0, y} }, m2_expected{ {0.0,0.0,1.0, z} }, m3_expected{ {0.0,0.0,0.0,1.0} };
+			ArithmeticStructures::row4x4 m0_expected{ {1.0, 0.0, 0.0, shift_x} }, m1_expected{ {0.0, 1.0, 0.0, shift_y} }, m2_expected{ {0.0,0.0,1.0, shift_z} }, m3_expected{ {0.0,0.0,0.0,1.0} };
 			ArithmeticStructures::Matrix4x4 m_expected{ m0_expected, m1_expected, m2_expected, m3_expected };
-			auto transformationMatrix{ ArithmeticStructures::getTranslationMatrix(x,y,z) };
+			auto transformationMatrix{ ArithmeticStructures::getTranslationMatrix(shift_x,shift_y,shift_z) };
 
 			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(m_expected, transformationMatrix));
 
@@ -472,6 +472,41 @@ namespace TDDRaytracerUnitTests
 			ArithmeticStructures::inverseMatrix(transformationMatrix);
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(originalPoint, ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, expectedResult_translatedPoint)));
 			
+		}
+
+		TEST_METHOD(ArithmeticStructure_MatrixScalingTest)
+		{
+			constexpr float scale_x{ 2.0 }, scale_y{ 3.0 }, scale_z{ 4.0 };
+
+			// is the transformation matrix created as expected
+			ArithmeticStructures::row4x4 m0_expected{ {scale_x, 0.0, 0.0,0.0} }, m1_expected{ {0.0, scale_y, 0.0, 0.0} }, m2_expected{ {0.0,0.0,scale_z, 0.0} }, m3_expected{ {0.0,0.0,0.0,1.0} };
+			ArithmeticStructures::Matrix4x4 m_expected{ m0_expected, m1_expected, m2_expected, m3_expected };
+			auto transformationMatrix{ ArithmeticStructures::getScalingMatrix(scale_x,scale_y,scale_z) };
+
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(m_expected, transformationMatrix));
+
+			// does translation work as expected - M * p = p`
+			ArithmeticStructures::HomogenousCoordinates originalPoint{ -4.0,6.0,8.0,1.0 };
+			ArithmeticStructures::HomogenousCoordinates expectedResult_scaledPoint{ -8.0,18.0,32.0,1.0 };
+
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedResult_scaledPoint, ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, originalPoint)));
+
+			// also make sure that scaling of vectors works as expceted
+			ArithmeticStructures::HomogenousCoordinates originalVector{ -4.0,6.0,8.0,0.0 };
+			ArithmeticStructures::HomogenousCoordinates expectedResult_scaledVector{ -8.0,18.0,32.0,0.0 };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedResult_scaledVector, ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, originalVector)));
+
+			// and also test the inverse - M^-1 * p` = p
+			ArithmeticStructures::inverseMatrix(transformationMatrix);
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(originalVector, ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, expectedResult_scaledVector)));
+
+			// also test reflection (aka "mirroring")
+			constexpr float reflect_x{ -1.0 }, reflect_y{ 1.0 }, reflect_z{ 1.0 };
+			ArithmeticStructures::HomogenousCoordinates originalPoint_2{ 2.0,3.0,4.0,1.0 };
+			ArithmeticStructures::HomogenousCoordinates expectedResult_reflectedPoint{ -2.0,3.0,4.0,1.0 };
+			auto transformationMatrix_reflection{ ArithmeticStructures::getScalingMatrix(reflect_x,reflect_y,reflect_z) };
+
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedResult_reflectedPoint, ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix_reflection, originalPoint_2)));
 		}
 
 		TEST_METHOD(Canvas_DimTest)
