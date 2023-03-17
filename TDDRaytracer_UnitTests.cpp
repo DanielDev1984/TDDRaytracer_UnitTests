@@ -509,6 +509,37 @@ namespace TDDRaytracerUnitTests
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedResult_reflectedPoint, ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix_reflection, originalPoint_2)));
 		}
 
+		TEST_METHOD(ArithmeticStructure_MatrixDegToRadFunctionTest)
+		{
+			float degToBeConvertedToRad{ 180 };
+			float expectedRad{ M_PI };
+
+			Assert::AreEqual(ArithmeticStructures::getRadiansForDeg(degToBeConvertedToRad), expectedRad);
+
+			degToBeConvertedToRad*=  -1.0 ;
+			expectedRad *= -1.0;
+
+			Assert::AreEqual(ArithmeticStructures::getRadiansForDeg(degToBeConvertedToRad), expectedRad);
+
+			degToBeConvertedToRad = 0.0;
+			expectedRad = 0.0;
+			Assert::AreEqual(ArithmeticStructures::getRadiansForDeg(degToBeConvertedToRad), expectedRad);
+		}
+
+		TEST_METHOD(ArithmeticStructure_MatrixRotationXAxisTest)
+		{
+
+			constexpr float rot_X{0.0};
+			Assert::Fail(); //todo: needs implementation!
+
+			// is the transformation matrix created as expected
+			/*ArithmeticStructures::row4x4 m0_expected{ {scale_x, 0.0, 0.0,0.0} }, m1_expected{ {0.0, scale_y, 0.0, 0.0} }, m2_expected{ {0.0,0.0,scale_z, 0.0} }, m3_expected{ {0.0,0.0,0.0,1.0} };
+			ArithmeticStructures::Matrix4x4 m_expected{ m0_expected, m1_expected, m2_expected, m3_expected };
+			auto transformationMatrix{ ArithmeticStructures::getScalingMatrix(scale_x,scale_y,scale_z) };
+
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(m_expected, transformationMatrix));*/
+		}
+
 		TEST_METHOD(Canvas_DimTest)
 		{
 			constexpr int xDim{ 256 }, yDim{ 354 };
