@@ -784,6 +784,43 @@ namespace TDDRaytracerUnitTests
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedResult_shearedPoint, ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, originalPoint)));
 		}
 
+		TEST_METHOD(ArithmeticStructure_MatrixConcatenationTest)
+		{
+			constexpr float rot_X_fullQuarter{ M_PI_2 }; // == 90°
+
+			const auto rotationMatrix{ ArithmeticStructures::getRotationMatrix_XAxis(rot_X_fullQuarter) };
+
+			// first apply rotation
+			constexpr ArithmeticStructures::HomogenousCoordinates originalPoint{ 1.0,0.0,1.0,1.0 };
+
+			ArithmeticStructures::HomogenousCoordinates expectedResult_rotatedPoint{ 1.0, -1.0,0.0, 1.0 };
+			const auto rotatedPoint{ ArithmeticStructures::multiplyMatrixWithTuple(rotationMatrix, originalPoint) };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedResult_rotatedPoint, rotatedPoint));
+
+
+			// then apply scaling
+			constexpr float scalingFactorXYZ{ 5.0 };
+
+			const  auto scalingMatrix{ ArithmeticStructures::getScalingMatrix(scalingFactorXYZ, scalingFactorXYZ, scalingFactorXYZ) };
+
+			ArithmeticStructures::HomogenousCoordinates expectedResult_rotatedAndScaledPoint{ 5.0, -5.0,0.0, 1.0 };
+			const auto rotatedAndScaledPoint{ ArithmeticStructures::multiplyMatrixWithTuple(scalingMatrix, rotatedPoint) };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedResult_rotatedAndScaledPoint, rotatedAndScaledPoint));
+
+			// then apply translation
+			constexpr float translation_X{ 10.0 }, translation_Y{ 5.0 }, translation_Z{ 7.0 };
+
+			const auto translationMatrix{ ArithmeticStructures::getTranslationMatrix(translation_X, translation_Y, translation_Z)};
+
+			ArithmeticStructures::HomogenousCoordinates expectedResult_rotatedAndScaledAndTranslatedPoint{ 15.0, 0.0,7.0, 1.0 };
+			const auto rotatedAndScaledAndTranslatedPoint{ ArithmeticStructures::multiplyMatrixWithTuple(translationMatrix, rotatedAndScaledPoint) };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedResult_rotatedAndScaledAndTranslatedPoint, rotatedAndScaledAndTranslatedPoint));
+
+			const auto concatenatedMatrix{ArithmeticStructures::multiplyMatrices(ArithmeticStructures::multiplyMatrices(translationMatrix,scalingMatrix), rotationMatrix)};
+
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedResult_rotatedAndScaledAndTranslatedPoint, ArithmeticStructures::multiplyMatrixWithTuple(concatenatedMatrix, originalPoint)));
+		}
+
 		TEST_METHOD(Canvas_DimTest)
 		{
 			constexpr int xDim{ 256 }, yDim{ 354 };
