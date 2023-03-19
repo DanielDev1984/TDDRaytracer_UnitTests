@@ -590,6 +590,38 @@ namespace TDDRaytracerUnitTests
 
 		}
 
+		TEST_METHOD(ArithmeticStructure_MatrixRotationZAxisTest)
+		{
+
+			constexpr float rot_Z_fullQuarter{ M_PI_2 }; // == 90°
+
+			// is the transformation matrix created as expected
+			const ArithmeticStructures::row4x4 m0_expected{ {cos(rot_Z_fullQuarter), -1.0* sin(rot_Z_fullQuarter),0.0,0.0} }, m1_expected{ {sin(rot_Z_fullQuarter), cos(rot_Z_fullQuarter),0.0, 0.0} },
+				m2_expected{ {0.0,0.0, 1.0, 0.0} }, m3_expected{ {0.0,0.0,0.0,1.0} };
+			const ArithmeticStructures::Matrix4x4 m_expected{ m0_expected, m1_expected, m2_expected, m3_expected };
+			auto transformationMatrix{ ArithmeticStructures::getRotationMatrix_ZAxis(rot_Z_fullQuarter) };
+
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(m_expected, transformationMatrix));
+
+			// does rotation work as expected - M * p = p`
+			constexpr ArithmeticStructures::HomogenousCoordinates originalPoint{ 0.0,1.0,0.0,1.0 };
+
+			ArithmeticStructures::HomogenousCoordinates expectedResult_rotatedPoint{ -1.0, 0.0,0.0, 1.0 };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedResult_rotatedPoint, ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, originalPoint)));
+
+			constexpr float rot_Z_halfQuarter{ M_PI_4 }; // == 45°
+			constexpr float halfSqrt2{ M_SQRT2 * 0.5 };
+			ArithmeticStructures::HomogenousCoordinates expectedResult_rotatedPoint_2{ -1.0*halfSqrt2,halfSqrt2,0.0, 1.0 };
+			auto transformationMatrix_2{ ArithmeticStructures::getRotationMatrix_ZAxis(rot_Z_halfQuarter) };
+			const auto rotatedPoint{ ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix_2, originalPoint) };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedResult_rotatedPoint_2, rotatedPoint));
+
+			////// and also test whether the inversion works - M^-1 * p` = p
+			ArithmeticStructures::inverseMatrix(transformationMatrix_2);
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(originalPoint, ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix_2, rotatedPoint)));
+
+		}
+
 		TEST_METHOD(Canvas_DimTest)
 		{
 			constexpr int xDim{ 256 }, yDim{ 354 };
