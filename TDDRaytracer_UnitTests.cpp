@@ -622,6 +622,168 @@ namespace TDDRaytracerUnitTests
 
 		}
 
+		// xPropToY
+		TEST_METHOD(ArithmeticStructure_MatrixShearingTest_1)
+		{
+			// shear (aka "move") x in proportion to y
+			constexpr float propXtoY{ 1.0 };
+			constexpr float propXtoZ{ 0.0 };
+			constexpr float propYtoX{ 0.0 };
+			constexpr float propYtoZ{ 0.0 };
+			constexpr float propZtoX{ 0.0 };
+			constexpr float propZtoY{ 0.0 };
+			// is the transformation matrix created as expected
+			
+			const ArithmeticStructures::row4x4 m0_expected{ {1.0, propXtoY,propXtoZ,0.0} }, m1_expected{ {propYtoX, 1.0,propYtoZ, 0.0} },
+				m2_expected{ {propZtoX,propZtoY, 1.0, 0.0} }, m3_expected{ {0.0,0.0,0.0,1.0} };
+			const ArithmeticStructures::Matrix4x4 m_expected{ m0_expected, m1_expected, m2_expected, m3_expected };
+			
+			auto transformationMatrix{ ArithmeticStructures::getShearingMatrix(propXtoY, propXtoZ, propYtoX, propYtoZ, propZtoX, propZtoY) };
+
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(m_expected, transformationMatrix));
+
+			// does shearing work as expected - M * p = p`
+			constexpr ArithmeticStructures::HomogenousCoordinates originalPoint{ 2.0,3.0,4.0,1.0 };
+
+			ArithmeticStructures::HomogenousCoordinates expectedResult_shearedPoint{ 5.0, 3.0,4.0, 1.0 };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedResult_shearedPoint, ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, originalPoint)));
+		}
+
+		// xPropToZ
+		TEST_METHOD(ArithmeticStructure_MatrixShearingTest_2)
+		{
+			// shear (aka "move") x in proportion to y
+			constexpr float propXtoY{ 0.0 };
+			constexpr float propXtoZ{ 1.0 };
+			constexpr float propYtoX{ 0.0 };
+			constexpr float propYtoZ{ 0.0 };
+			constexpr float propZtoX{ 0.0 };
+			constexpr float propZtoY{ 0.0 };
+			// is the transformation matrix created as expected
+
+			const ArithmeticStructures::row4x4 m0_expected{ {1.0, propXtoY,propXtoZ,0.0} }, m1_expected{ {propYtoX, 1.0,propYtoZ, 0.0} },
+				m2_expected{ {propZtoX,propZtoY, 1.0, 0.0} }, m3_expected{ {0.0,0.0,0.0,1.0} };
+			const ArithmeticStructures::Matrix4x4 m_expected{ m0_expected, m1_expected, m2_expected, m3_expected };
+
+			auto transformationMatrix{ ArithmeticStructures::getShearingMatrix(propXtoY, propXtoZ, propYtoX, propYtoZ, propZtoX, propZtoY) };
+
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(m_expected, transformationMatrix));
+
+			// does shearing work as expected - M * p = p`
+			constexpr ArithmeticStructures::HomogenousCoordinates originalPoint{ 2.0,3.0,4.0,1.0 };
+
+			ArithmeticStructures::HomogenousCoordinates expectedResult_shearedPoint{ 6.0, 3.0,4.0, 1.0 };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedResult_shearedPoint, ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, originalPoint)));
+		}
+
+		//// yPropToX
+		TEST_METHOD(ArithmeticStructure_MatrixShearingTest_3)
+		{
+			// shear (aka "move") x in proportion to y
+			constexpr float propXtoY{ 0.0 };
+			constexpr float propXtoZ{ 0.0 };
+			constexpr float propYtoX{ 1.0 };
+			constexpr float propYtoZ{ 0.0 };
+			constexpr float propZtoX{ 0.0 };
+			constexpr float propZtoY{ 0.0 };
+			// is the transformation matrix created as expected
+
+			const ArithmeticStructures::row4x4 m0_expected{ {1.0, propXtoY,propXtoZ,0.0} }, m1_expected{ {propYtoX, 1.0,propYtoZ, 0.0} },
+				m2_expected{ {propZtoX,propZtoY, 1.0, 0.0} }, m3_expected{ {0.0,0.0,0.0,1.0} };
+			const ArithmeticStructures::Matrix4x4 m_expected{ m0_expected, m1_expected, m2_expected, m3_expected };
+
+			auto transformationMatrix{ ArithmeticStructures::getShearingMatrix(propXtoY, propXtoZ, propYtoX, propYtoZ, propZtoX, propZtoY) };
+
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(m_expected, transformationMatrix));
+
+			// does shearing work as expected - M * p = p`
+			constexpr ArithmeticStructures::HomogenousCoordinates originalPoint{ 2.0,3.0,4.0,1.0 };
+
+			ArithmeticStructures::HomogenousCoordinates expectedResult_shearedPoint{ 2.0, 5.0,4.0, 1.0 };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedResult_shearedPoint, ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, originalPoint)));
+		}
+
+		//// yPropToZ
+		TEST_METHOD(ArithmeticStructure_MatrixShearingTest_4)
+		{
+			// shear (aka "move") x in proportion to y
+			constexpr float propXtoY{ 0.0 };
+			constexpr float propXtoZ{ 0.0 };
+			constexpr float propYtoX{ 0.0 };
+			constexpr float propYtoZ{ 1.0 };
+			constexpr float propZtoX{ 0.0 };
+			constexpr float propZtoY{ 0.0 };
+			// is the transformation matrix created as expected
+
+			const ArithmeticStructures::row4x4 m0_expected{ {1.0, propXtoY,propXtoZ,0.0} }, m1_expected{ {propYtoX, 1.0,propYtoZ, 0.0} },
+				m2_expected{ {propZtoX,propZtoY, 1.0, 0.0} }, m3_expected{ {0.0,0.0,0.0,1.0} };
+			const ArithmeticStructures::Matrix4x4 m_expected{ m0_expected, m1_expected, m2_expected, m3_expected };
+
+			auto transformationMatrix{ ArithmeticStructures::getShearingMatrix(propXtoY, propXtoZ, propYtoX, propYtoZ, propZtoX, propZtoY) };
+
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(m_expected, transformationMatrix));
+
+			// does shearing work as expected - M * p = p`
+			constexpr ArithmeticStructures::HomogenousCoordinates originalPoint{ 2.0,3.0,4.0,1.0 };
+
+			ArithmeticStructures::HomogenousCoordinates expectedResult_shearedPoint{ 2.0, 7.0,4.0, 1.0 };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedResult_shearedPoint, ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, originalPoint)));
+		}
+
+		//// zPropToX
+		TEST_METHOD(ArithmeticStructure_MatrixShearingTest_5)
+		{
+			// shear (aka "move") x in proportion to y
+			constexpr float propXtoY{ 0.0 };
+			constexpr float propXtoZ{ 0.0 };
+			constexpr float propYtoX{ 0.0 };
+			constexpr float propYtoZ{ 0.0 };
+			constexpr float propZtoX{ 1.0 };
+			constexpr float propZtoY{ 0.0 };
+			// is the transformation matrix created as expected
+
+			const ArithmeticStructures::row4x4 m0_expected{ {1.0, propXtoY,propXtoZ,0.0} }, m1_expected{ {propYtoX, 1.0,propYtoZ, 0.0} },
+				m2_expected{ {propZtoX,propZtoY, 1.0, 0.0} }, m3_expected{ {0.0,0.0,0.0,1.0} };
+			const ArithmeticStructures::Matrix4x4 m_expected{ m0_expected, m1_expected, m2_expected, m3_expected };
+
+			auto transformationMatrix{ ArithmeticStructures::getShearingMatrix(propXtoY, propXtoZ, propYtoX, propYtoZ, propZtoX, propZtoY) };
+
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(m_expected, transformationMatrix));
+
+			// does shearing work as expected - M * p = p`
+			constexpr ArithmeticStructures::HomogenousCoordinates originalPoint{ 2.0,3.0,4.0,1.0 };
+
+			ArithmeticStructures::HomogenousCoordinates expectedResult_shearedPoint{ 2.0, 3.0,6.0, 1.0 };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedResult_shearedPoint, ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, originalPoint)));
+		}
+
+		//// zPropToY
+		TEST_METHOD(ArithmeticStructure_MatrixShearingTest_6)
+		{
+			// shear (aka "move") x in proportion to y
+			constexpr float propXtoY{ 0.0 };
+			constexpr float propXtoZ{ 0.0 };
+			constexpr float propYtoX{ 0.0 };
+			constexpr float propYtoZ{ 0.0 };
+			constexpr float propZtoX{ 0.0 };
+			constexpr float propZtoY{ 1.0 };
+			// is the transformation matrix created as expected
+
+			const ArithmeticStructures::row4x4 m0_expected{ {1.0, propXtoY,propXtoZ,0.0} }, m1_expected{ {propYtoX, 1.0,propYtoZ, 0.0} },
+				m2_expected{ {propZtoX,propZtoY, 1.0, 0.0} }, m3_expected{ {0.0,0.0,0.0,1.0} };
+			const ArithmeticStructures::Matrix4x4 m_expected{ m0_expected, m1_expected, m2_expected, m3_expected };
+
+			auto transformationMatrix{ ArithmeticStructures::getShearingMatrix(propXtoY, propXtoZ, propYtoX, propYtoZ, propZtoX, propZtoY) };
+
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(m_expected, transformationMatrix));
+
+			// does shearing work as expected - M * p = p`
+			constexpr ArithmeticStructures::HomogenousCoordinates originalPoint{ 2.0,3.0,4.0,1.0 };
+
+			ArithmeticStructures::HomogenousCoordinates expectedResult_shearedPoint{ 2.0, 3.0,7.0, 1.0 };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedResult_shearedPoint, ArithmeticStructures::multiplyMatrixWithTuple(transformationMatrix, originalPoint)));
+		}
+
 		TEST_METHOD(Canvas_DimTest)
 		{
 			constexpr int xDim{ 256 }, yDim{ 354 };
