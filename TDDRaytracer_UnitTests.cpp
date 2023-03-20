@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "CppUnitTest.h"
 #include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\ArithmeticStructures.h"
+#include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\Ray.h"
 #include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\Canvas.h"
 #include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\PPMWriter.h"
 #include <fstream>
@@ -819,6 +820,18 @@ namespace TDDRaytracerUnitTests
 			const auto concatenatedMatrix{ArithmeticStructures::multiplyMatrices(ArithmeticStructures::multiplyMatrices(translationMatrix,scalingMatrix), rotationMatrix)};
 
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedResult_rotatedAndScaledAndTranslatedPoint, ArithmeticStructures::multiplyMatrixWithTuple(concatenatedMatrix, originalPoint)));
+		}
+
+		TEST_METHOD(ArithmeticStructure_RayTest)
+		{
+			const ArithmeticStructures::HomogenousCoordinates origin{ 1.0,2.0,3.0,1.0 };
+			const ArithmeticStructures::HomogenousCoordinates direction{ 4.0,5.0,6.0,0.0 };
+			Ray ray{origin, direction};
+			const ArithmeticStructures::HomogenousCoordinates expected_origin{ 1.0,2.0,3.0,1.0 };
+			const ArithmeticStructures::HomogenousCoordinates expected_direction{ 4.0,5.0,6.0,0.0 };
+
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expected_origin, ray.getOrigin()));
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expected_direction, ray.getDirection()));
 		}
 
 		TEST_METHOD(Canvas_DimTest)
