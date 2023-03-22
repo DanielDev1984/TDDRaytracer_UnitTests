@@ -834,6 +834,24 @@ namespace TDDRaytracerUnitTests
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expected_direction, ray.getDirection()));
 		}
 
+		TEST_METHOD(ArithmeticStructure_RayPositionTest)
+		{
+			constexpr float t_1{ 0.0 }, t_2{ 1.0 }, t_3{ -1.0 }, t_4{ 2.5 };
+
+			const ArithmeticStructures::HomogenousCoordinates origin{ 2.0,3.0,4.0,1.0 };
+			const ArithmeticStructures::HomogenousCoordinates direction{ 1.0,0.0,0.0,0.0 };
+			Ray ray{ origin, direction };
+			
+			const ArithmeticStructures::HomogenousCoordinates expectedPos_t1{ 2.0,3.0,4.0,1.0 };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedPos_t1, ray.getPosition(t_1)));
+			const ArithmeticStructures::HomogenousCoordinates expectedPos_t2{ 3.0,3.0,4.0,1.0 };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedPos_t2, ray.getPosition(t_2)));
+			const ArithmeticStructures::HomogenousCoordinates expectedPos_t3{ 1.0,3.0,4.0,1.0 };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedPos_t3, ray.getPosition(t_3)));
+			const ArithmeticStructures::HomogenousCoordinates expectedPos_t4{ 4.5,3.0,4.0,1.0 };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedPos_t4, ray.getPosition(t_4)));
+		}
+
 		TEST_METHOD(Canvas_DimTest)
 		{
 			constexpr int xDim{ 256 }, yDim{ 354 };
