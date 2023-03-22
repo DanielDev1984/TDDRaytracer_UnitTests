@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "CppUnitTest.h"
 #include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\ArithmeticStructures.h"
+#include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\GeometricStructures.h"
 #include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\Ray.h"
 #include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\Canvas.h"
 #include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\PPMWriter.h"
@@ -822,7 +823,7 @@ namespace TDDRaytracerUnitTests
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedResult_rotatedAndScaledAndTranslatedPoint, ArithmeticStructures::multiplyMatrixWithTuple(concatenatedMatrix, originalPoint)));
 		}
 
-		TEST_METHOD(ArithmeticStructure_RayTest)
+		TEST_METHOD(Ray_InitializationTest)
 		{
 			const ArithmeticStructures::HomogenousCoordinates origin{ 1.0,2.0,3.0,1.0 };
 			const ArithmeticStructures::HomogenousCoordinates direction{ 4.0,5.0,6.0,0.0 };
@@ -834,7 +835,7 @@ namespace TDDRaytracerUnitTests
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expected_direction, ray.getDirection()));
 		}
 
-		TEST_METHOD(ArithmeticStructure_RayPositionTest)
+		TEST_METHOD(Ray_PositionTest)
 		{
 			constexpr float t_1{ 0.0 }, t_2{ 1.0 }, t_3{ -1.0 }, t_4{ 2.5 };
 
@@ -850,6 +851,22 @@ namespace TDDRaytracerUnitTests
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedPos_t3, ray.getPosition(t_3)));
 			const ArithmeticStructures::HomogenousCoordinates expectedPos_t4{ 4.5,3.0,4.0,1.0 };
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedPos_t4, ray.getPosition(t_4)));
+		}
+
+		TEST_METHOD(GeometricStructures_IntersectionTest)
+		{
+			const ArithmeticStructures::HomogenousCoordinates ray_Origin{ 0.0,0.0,-5.0,1.0 };
+			const ArithmeticStructures::HomogenousCoordinates ray_Direction{ 0.0,0.0,1.0,0.0 };
+			Ray ray{ ray_Origin, ray_Direction };
+			const ArithmeticStructures::HomogenousCoordinates sphere_Origin{ 0.0,0.0,0.0,1.0 };
+			constexpr int sphere_Radius{ 1 };
+			GeometricStructures::Sphere sphere{sphere_Origin, sphere_Radius};
+			const GeometricStructures::Intersections expectedIntersections{ 4.0,6.0 };
+			GeometricStructures::Intersections actualIntersections{ sphere.getIntersections(ray) };
+			// first check whether all expected intersections have been found
+			Assert::IsTrue(expectedIntersections.size() == actualIntersections.size());
+			// then check whether they are correct
+			Assert::IsTrue(expectedIntersections == actualIntersections);
 		}
 
 		TEST_METHOD(Canvas_DimTest)
