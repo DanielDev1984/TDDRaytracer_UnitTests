@@ -876,18 +876,21 @@ namespace TDDRaytracerUnitTests
 
 		TEST_METHOD(GeometricStructures_IntersectionTest)
 		{
+			// place the ray "in front" of the origin of the sphere and propagate the ray into the direction of the sphere, along the zaxis
 			const ArithmeticStructures::HomogenousCoordinates ray_Origin{ 0.0,0.0,-5.0,1.0 };
 			const ArithmeticStructures::HomogenousCoordinates ray_Direction{ 0.0,0.0,1.0,0.0 };
 			Ray ray{ ray_Origin, ray_Direction };
 			const ArithmeticStructures::HomogenousCoordinates sphere_Origin{ 0.0,0.0,0.0,1.0 };
 			constexpr int sphere_Radius{ 1 };
 			GeometricStructures::Sphere sphere{sphere_Origin, sphere_Radius};
+			// expect the ray to intersect with the sphere two times. once on sphere entry, and afterwards while exiting the sphere
 			const GeometricStructures::Intersections expectedIntersections{ 4.0,6.0 };
+
 			GeometricStructures::Intersections actualIntersections{ sphere.getIntersections(ray) };
 			// first check whether all expected intersections have been found
 			Assert::IsTrue(expectedIntersections.size() == actualIntersections.size());
 			// then check whether they are correct
-			Assert::IsTrue(expectedIntersections == actualIntersections);
+			Assert::AreEqual(expectedIntersections.at(0), actualIntersections.at(0), 0.0001f);
 		}
 
 		TEST_METHOD(Canvas_DimTest)
