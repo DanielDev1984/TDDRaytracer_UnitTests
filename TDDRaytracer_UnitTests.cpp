@@ -79,10 +79,22 @@ namespace TDDRaytracerUnitTests
 
 		TEST_METHOD(ArithmeticStructures_SubtractCoordinatesTest)
 		{
-			const  ArithmeticStructures::HomogenousCoordinates point_1{ 3.0,2.0,1.0,1.0 };
-			const  ArithmeticStructures::HomogenousCoordinates point_2{ 5.0,6.0,7.0,1.0 };
+			ArithmeticStructures::HomogenousCoordinates point_1{ 3.0,2.0,1.0,1.0 };
+			ArithmeticStructures::HomogenousCoordinates point_2{ 5.0,6.0,7.0,1.0 };
 			const ArithmeticStructures::HomogenousCoordinates expectedVector_afterSubtraction{ -2.0,-4.0,-6.0,0.0 };
+			// subtracting point from point results in expected vector
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedVector_afterSubtraction, ArithmeticStructures::subtractCoordinates(point_1, point_2)));
 
+			// "transform" the point into a vector
+			auto& [x_point2, y_point2, z_point2, w_point2] = point_2;
+			w_point2 = 0.0;
+			// subtracting point from vector results in expected vector
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedVector_afterSubtraction, ArithmeticStructures::subtractCoordinates(point_1, point_2)));
+
+			// "transform" the point into a vector
+			auto& [x_point1, y_point1, z_point1, w_point1] = point_1;
+			w_point1 = 0.0;
+			// subtracting vector from vector results in expected vector
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedVector_afterSubtraction, ArithmeticStructures::subtractCoordinates(point_1, point_2)));
 		}
 
