@@ -77,6 +77,15 @@ namespace TDDRaytracerUnitTests
 
 		}
 
+		TEST_METHOD(ArithmeticStructures_SubtractCoordinatesTest)
+		{
+			const  ArithmeticStructures::HomogenousCoordinates point_1{ 3.0,2.0,1.0,1.0 };
+			const  ArithmeticStructures::HomogenousCoordinates point_2{ 5.0,6.0,7.0,1.0 };
+			const ArithmeticStructures::HomogenousCoordinates expectedVector_afterSubtraction{ -2.0,-4.0,-6.0,0.0 };
+
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedVector_afterSubtraction, ArithmeticStructures::subtractCoordinates(point_1, point_2)));
+		}
+
 		TEST_METHOD(ArithmeticStructures_MultiplyScalarTest)
 		{
 			constexpr float s{ 2.0 };
