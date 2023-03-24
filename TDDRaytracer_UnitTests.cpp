@@ -884,9 +884,24 @@ namespace TDDRaytracerUnitTests
 			constexpr int sphere_Radius{ 1 };
 			GeometricStructures::Sphere sphere{sphere_Origin, sphere_Radius};
 			// expect the ray to intersect with the sphere two times. once on sphere entry, and afterwards while exiting the sphere
-			const GeometricStructures::Intersections expectedIntersections{ 4.0,6.0 };
+			GeometricStructures::Intersections expectedIntersections{ 4.0,6.0 };
 
 			GeometricStructures::Intersections actualIntersections{ sphere.getIntersections(ray) };
+			// first check whether all expected intersections have been found
+			Assert::IsTrue(expectedIntersections.size() == actualIntersections.size());
+			// then check whether they are correct
+			Assert::AreEqual(expectedIntersections.at(0), actualIntersections.at(0), 0.0001f);
+			Assert::AreEqual(expectedIntersections.at(1), actualIntersections.at(1), 0.0001f);
+
+
+			// place the ray at the height of the sphere radius and intersect it tangentially
+			ray.setOrigin(0.0, 1.0, - 5.0);
+			expectedIntersections.clear();
+			// albeit only intersecting the speher tangentially, 2 (equal!) points of intersection will be returned
+			expectedIntersections.push_back(5.0);
+			expectedIntersections.push_back(5.0);
+
+			actualIntersections = sphere.getIntersections(ray) ;
 			// first check whether all expected intersections have been found
 			Assert::IsTrue(expectedIntersections.size() == actualIntersections.size());
 			// then check whether they are correct
