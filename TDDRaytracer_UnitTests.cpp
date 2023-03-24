@@ -927,7 +927,18 @@ namespace TDDRaytracerUnitTests
 			Assert::AreEqual(expectedIntersections.at(0), actualIntersections.at(0), 0.0001f);
 			Assert::AreEqual(expectedIntersections.at(1), actualIntersections.at(1), 0.0001f);
 
+			// place the ray "in front" of the sphere and the ray direction pointing "away" from the sphere. expecting 2 intersections "behind" the rays origin
+			ray.setOrigin(0.0, 0.0, 5.0);
+			expectedIntersections.clear();
+			expectedIntersections.push_back(-6.0);
+			expectedIntersections.push_back(-4.0);
 
+			actualIntersections = sphere.getIntersections(ray);
+			// first check whether all expected intersections have been found
+			Assert::IsTrue(expectedIntersections.size() == actualIntersections.size());
+			// then check whether they are correct
+			Assert::AreEqual(expectedIntersections.at(0), actualIntersections.at(0), 0.0001f);
+			Assert::AreEqual(expectedIntersections.at(1), actualIntersections.at(1), 0.0001f);
 		}
 
 		TEST_METHOD(Canvas_DimTest)
