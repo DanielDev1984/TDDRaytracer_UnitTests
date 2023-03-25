@@ -2,6 +2,7 @@
 #include "CppUnitTest.h"
 #include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\ArithmeticStructures.h"
 #include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\GeometricStructures.h"
+#include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\SceneObject.h"
 #include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\Ray.h"
 #include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\Canvas.h"
 #include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\PPMWriter.h"
@@ -874,7 +875,7 @@ namespace TDDRaytracerUnitTests
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedPos_t4, ray.getPosition(t_4)));
 		}
 
-		TEST_METHOD(GeometricStructures_IntersectionTest)
+		TEST_METHOD(SceneObject_IntersectionTest)
 		{
 			// place the ray "in front" of the origin of the sphere and propagate the ray into the direction of the sphere, along the zaxis
 			const ArithmeticStructures::HomogenousCoordinates ray_Origin{ 0.0,0.0,-5.0,1.0 };
@@ -883,10 +884,11 @@ namespace TDDRaytracerUnitTests
 			const ArithmeticStructures::HomogenousCoordinates sphere_Origin{ 0.0,0.0,0.0,1.0 };
 			constexpr int sphere_Radius{ 1 };
 			GeometricStructures::Sphere sphere{sphere_Origin, sphere_Radius};
+			SceneObject sO{sphere};
 			// expect the ray to intersect with the sphere two times. once on sphere entry, and afterwards while exiting the sphere
-			GeometricStructures::Intersections expectedIntersections{ 4.0,6.0 };
+			SceneObject::Intersections expectedIntersections{ 4.0,6.0 };
 
-			GeometricStructures::Intersections actualIntersections{ sphere.getIntersections(ray) };
+			SceneObject::Intersections actualIntersections{ sO.getIntersections(ray) };
 			// first check whether all expected intersections have been found
 			Assert::IsTrue(expectedIntersections.size() == actualIntersections.size());
 			// then check whether they are correct
@@ -901,7 +903,7 @@ namespace TDDRaytracerUnitTests
 			expectedIntersections.push_back(5.0);
 			expectedIntersections.push_back(5.0);
 
-			actualIntersections = sphere.getIntersections(ray) ;
+			actualIntersections = sO.getIntersections(ray) ;
 			// first check whether all expected intersections have been found
 			Assert::IsTrue(expectedIntersections.size() == actualIntersections.size());
 			// then check whether they are correct
@@ -910,7 +912,7 @@ namespace TDDRaytracerUnitTests
 
 			// place the ray above the sphere -> dont intersect the sphere at all
 			ray.setOrigin(0.0, 2.0, -5.0);
-			actualIntersections = sphere.getIntersections(ray);
+			actualIntersections = sO.getIntersections(ray);
 			// no intersections expected
 			Assert::IsTrue(actualIntersections.empty());
 
@@ -920,7 +922,7 @@ namespace TDDRaytracerUnitTests
 			expectedIntersections.push_back(-1.0);
 			expectedIntersections.push_back(1.0);
 
-			actualIntersections = sphere.getIntersections(ray);
+			actualIntersections = sO.getIntersections(ray);
 			// first check whether all expected intersections have been found
 			Assert::IsTrue(expectedIntersections.size() == actualIntersections.size());
 			// then check whether they are correct
@@ -933,7 +935,7 @@ namespace TDDRaytracerUnitTests
 			expectedIntersections.push_back(-6.0);
 			expectedIntersections.push_back(-4.0);
 
-			actualIntersections = sphere.getIntersections(ray);
+			actualIntersections = sO.getIntersections(ray);
 			// first check whether all expected intersections have been found
 			Assert::IsTrue(expectedIntersections.size() == actualIntersections.size());
 			// then check whether they are correct
