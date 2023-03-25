@@ -875,7 +875,7 @@ namespace TDDRaytracerUnitTests
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedPos_t4, ray.getPosition(t_4)));
 		}
 
-		TEST_METHOD(SceneObject_IntersectionTest)
+		TEST_METHOD(SceneObject_SphereIntersectionTest)
 		{
 			// place the ray "in front" of the origin of the sphere and propagate the ray into the direction of the sphere, along the zaxis
 			const ArithmeticStructures::HomogenousCoordinates ray_Origin{ 0.0,0.0,-5.0,1.0 };
