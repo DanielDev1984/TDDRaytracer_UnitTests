@@ -876,6 +876,20 @@ namespace TDDRaytracerUnitTests
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedPos_t4, ray.getPosition(t_4)));
 		}
 
+		TEST_METHOD(Ray_TranslationTest)
+		{
+			const ArithmeticStructures::HomogenousCoordinates origin{ 1.0,2.0,3.0,1.0 };
+			const ArithmeticStructures::HomogenousCoordinates direction{ 0.0,1.0,0.0,0.0 };
+			Ray original_ray{ origin, direction };
+			constexpr float shift_x{ 3.0 }, shift_y{ 4.0 }, shift_z{ 5.0 };
+
+			auto shiftedRay{ original_ray.translate(shift_x, shift_y, shift_z) };
+			const auto expectedOrigin{ ArithmeticStructures::HomogenousCoordinates{4.0,6.0,8.0,1.0} };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedOrigin, shiftedRay.getOrigin()));
+			const auto expectedDirection{ original_ray.getDirection() };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedDirection, shiftedRay.getDirection()));
+		}
+
 		TEST_METHOD(SceneObject_SphereIntersectionTest)
 		{
 			// place the ray "in front" of the origin of the sphere and propagate the ray into the direction of the sphere, along the zaxis
