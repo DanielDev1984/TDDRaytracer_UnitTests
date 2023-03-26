@@ -9,6 +9,7 @@
 #include <fstream>
 #include <filesystem>
 #include <array>
+#include <cmath>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -898,10 +899,10 @@ namespace TDDRaytracerUnitTests
 
 			// place the ray at the height of the sphere radius and intersect it tangentially
 			ray.setOrigin(0.0, 1.0, - 5.0);
-			expectedIntersections.clear();
+			
 			// albeit only intersecting the speher tangentially, 2 (equal!) points of intersection will be returned
-			expectedIntersections.push_back(5.0);
-			expectedIntersections.push_back(5.0);
+			expectedIntersections.at(0) = 5.0;
+			expectedIntersections.at(1) = 5.0;
 
 			actualIntersections = sO.getSphereIntersections(ray) ;
 			// first check whether all expected intersections have been found
@@ -913,14 +914,16 @@ namespace TDDRaytracerUnitTests
 			// place the ray above the sphere -> dont intersect the sphere at all
 			ray.setOrigin(0.0, 2.0, -5.0);
 			actualIntersections = sO.getSphereIntersections(ray);
+			expectedIntersections.at(0) = SceneObject::Invalid;
+			expectedIntersections.at(1) = SceneObject::Invalid;
 			// no intersections expected
-			Assert::IsTrue(actualIntersections.empty());
+			Assert::AreEqual(expectedIntersections.at(0), actualIntersections.at(0), 0.0001f);
+			Assert::AreEqual(expectedIntersections.at(1), actualIntersections.at(1), 0.0001f);
 
 			// place the ray in the center of the sphere and expect 2 intersections. noe "behind" and one "in front" of the rays origin
 			ray.setOrigin(0.0, 0.0, 0.0);
-			expectedIntersections.clear();
-			expectedIntersections.push_back(-1.0);
-			expectedIntersections.push_back(1.0);
+			expectedIntersections.at(0) = -1.0;
+			expectedIntersections.at(1) = 1.0;
 
 			actualIntersections = sO.getSphereIntersections(ray);
 			// first check whether all expected intersections have been found
@@ -931,9 +934,8 @@ namespace TDDRaytracerUnitTests
 
 			// place the ray "in front" of the sphere and the ray direction pointing "away" from the sphere. expecting 2 intersections "behind" the rays origin
 			ray.setOrigin(0.0, 0.0, 5.0);
-			expectedIntersections.clear();
-			expectedIntersections.push_back(-6.0);
-			expectedIntersections.push_back(-4.0);
+			expectedIntersections.at(0) = -6.0;
+			expectedIntersections.at(1) = -4.0;
 
 			actualIntersections = sO.getSphereIntersections(ray);
 			// first check whether all expected intersections have been found
@@ -941,6 +943,41 @@ namespace TDDRaytracerUnitTests
 			// then check whether they are correct
 			Assert::AreEqual(expectedIntersections.at(0), actualIntersections.at(0), 0.0001f);
 			Assert::AreEqual(expectedIntersections.at(1), actualIntersections.at(1), 0.0001f);
+		}
+
+		TEST_METHOD(SceneObject_SphereHitTest)
+		{
+			// place the ray "in front" of the origin of the sphere and propagate the ray into the direction of the sphere, along the zaxis
+			const ArithmeticStructures::HomogenousCoordinates ray_Origin{ 0.0,0.0,-5.0,1.0 };
+			const ArithmeticStructures::HomogenousCoordinates ray_Direction{ 0.0,0.0,1.0,0.0 };
+			Ray ray{ ray_Origin, ray_Direction };
+			const ArithmeticStructures::HomogenousCoordinates sphere_Origin{ 0.0,0.0,0.0,1.0 };
+			constexpr int sphere_Radius{ 1 };
+			GeometricStructures::Sphere sphere{ sphere_Origin, sphere_Radius };
+			SceneObject sO{ sphere };
+			// expect the ray to intersect with the sphere two times. once on sphere entry, and afterwards while exiting the sphere
+			// the entrypoint is expected to be the hit
+			float expectedHit{ 4.0 };
+
+			float actualHit{ sO.getSphereHit(ray) };
+			
+			Assert::AreEqual(expectedHit, actualHit, 0.0001f);
+
+
+			// place the ray in the center of the sphere and expect 2 intersections. one "behind" and one "in front" of the rays origin
+			// the expected hitpoint is the intersection "in front" of the ray
+			ray.setOrigin(0.0, 0.0, 0.0);
+			expectedHit = 1.0;
+
+			actualHit =sO.getSphereHit(ray) ;
+			Assert::AreEqual(expectedHit, actualHit, 0.0001f);
+
+			// place the ray "in front" of the sphere and the ray direction pointing "away" from the sphere. expecting 2 intersections "behind" the rays origin
+			// as there will be no hitpoint, the expected hit value is set to the according "indicator value" (NAN) -> comparing the actual value with isnan as NANs cant be compared directly
+			ray.setOrigin(0.0, 0.0, 5.0);
+
+			actualHit = sO.getSphereHit(ray);
+			Assert::IsTrue(std::isnan(actualHit));
 		}
 
 		TEST_METHOD(Canvas_DimTest)
