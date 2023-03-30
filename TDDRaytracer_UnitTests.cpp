@@ -890,6 +890,20 @@ namespace TDDRaytracerUnitTests
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedDirection, shiftedRay.getDirection()));
 		}
 
+		TEST_METHOD(Ray_ScalingTest)
+		{
+			const ArithmeticStructures::HomogenousCoordinates origin{ 1.0,2.0,3.0,1.0 };
+			const ArithmeticStructures::HomogenousCoordinates direction{ 0.0,1.0,0.0,0.0 };
+			Ray original_ray{ origin, direction };
+			constexpr float scale_x{ 2.0 }, scale_y{ 3.0 }, scale_z{ 4.0 };
+
+			auto scaledRay{ original_ray.scale(scale_x, scale_y, scale_z) };
+			const auto expectedOrigin{ ArithmeticStructures::HomogenousCoordinates{2.0,6.0,12.0,1.0} };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedOrigin, scaledRay.getOrigin()));
+			const auto expectedDirection{ ArithmeticStructures::HomogenousCoordinates{0.0,3.0,0.0,0.0} };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedDirection, scaledRay.getDirection()));
+		}
+
 		TEST_METHOD(SceneObject_SphereIntersectionTest)
 		{
 			// place the ray "in front" of the origin of the sphere and propagate the ray into the direction of the sphere, along the zaxis
