@@ -321,6 +321,18 @@ namespace TDDRaytracerUnitTests
 
 		}
 
+
+		TEST_METHOD(ArithmeticStructure_MatrixAssignmentTest)
+		{
+			ArithmeticStructures::Matrix4x4 m = ArithmeticStructures::getIdentityMatrix();
+			ArithmeticStructures::row4x4 expectedResult_m0{ {0.0, 9.0, 3.0, 0.0} }, expectedResult_m1{ {9.0, 8.0, 0.0, 8.0} }, expectedResult_m2{ {1.0,8.0,5.0, 3.0} }, expectedResult_m3{ {0.0,0.0,5.0,8.0} };
+			ArithmeticStructures::Matrix4x4 expectedResult{ expectedResult_m0 , expectedResult_m1,expectedResult_m2,expectedResult_m3 };
+
+			m = expectedResult;
+
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(expectedResult, m));
+		}
+
 		TEST_METHOD(ArithmeticStructure_MatrixCalculateDeterminantTest)
 		{
 			ArithmeticStructures::row2x2 m0{ {1.0, 5.0} }, m1{ {-3.0, 2.0} };
@@ -903,6 +915,42 @@ namespace TDDRaytracerUnitTests
 			const auto expectedDirection{ ArithmeticStructures::HomogenousCoordinates{0.0,3.0,0.0,0.0} };
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedDirection, scaledRay.getDirection()));
 		}
+
+
+		TEST_METHOD(Ray_SceneObjectTransformationTest)
+		{
+			const ArithmeticStructures::HomogenousCoordinates sphere_Origin{ 0.0,0.0,0.0,1.0 };
+			constexpr int sphere_Radius{ 1 };
+			GeometricStructures::Sphere sphere{ sphere_Origin, sphere_Radius };
+			SceneObject sO{ sphere };
+			ArithmeticStructures::Matrix4x4 expectedTransformation{ ArithmeticStructures::getIdentityMatrix() };
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(expectedTransformation, sO.getSphereTransformation()));
+		}
+
+		//TEST_METHOD(Ray_ScaledSphereIntersectionTest)
+		//{
+		//	Assert::Fail();
+		//	//const ArithmeticStructures::HomogenousCoordinates origin{ 0.0,0.0,-5.0,1.0 };
+		//	//const ArithmeticStructures::HomogenousCoordinates direction{ 0.0,0.0,1.0,0.0 };
+		//	//Ray ray{ origin, direction };
+
+		//	//constexpr float scale_x{ 2.0 }, scale_y{ 2.0 }, scale_z{ 2.0 };
+
+		//	//const ArithmeticStructures::HomogenousCoordinates sphere_Origin{ 0.0,0.0,0.0,1.0 };
+		//	//constexpr int sphere_Radius{ 1 };
+		//	//GeometricStructures::Sphere sphere{ sphere_Origin, sphere_Radius };
+		//	//SceneObject sO{ sphere };
+
+		//	//// expect the ray to intersect with the scaled sphere two times. once on sphere entry, and afterwards while exiting the sphere
+		//	//SceneObject::Intersections expectedIntersections{ 3.0,7.0 };
+
+		//	//SceneObject::Intersections actualIntersections{ sO.getSphereIntersections(ray) };
+		//	//// first check whether all expected intersections have been found
+		//	//Assert::IsTrue(expectedIntersections.size() == actualIntersections.size());
+		//	//// then check whether they are correct
+		//	//Assert::AreEqual(expectedIntersections.at(0), actualIntersections.at(0), 3.0001f);
+		//	//Assert::AreEqual(expectedIntersections.at(1), actualIntersections.at(1), 7.0001f);
+		//}
 
 		TEST_METHOD(SceneObject_SphereIntersectionTest)
 		{
