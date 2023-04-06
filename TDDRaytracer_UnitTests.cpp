@@ -935,14 +935,14 @@ namespace TDDRaytracerUnitTests
 			ArithmeticStructures::Matrix4x4 expectedTransformation{ ArithmeticStructures::getIdentityMatrix() };
 			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(expectedTransformation, sO.getSphereScaling()));
 
-			constexpr float shiftX{ 2.0 }, shiftY{ 3.0 }, shiftZ{ 4.0 };
+			constexpr float scaleX{ 2.0 }, scaleY{ 3.0 }, scaleZ{ 4.0 };
 
-			sO.setSphereScaling(ArithmeticStructures::getTranslationMatrix(shiftX, shiftY, shiftZ));
-			expectedTransformation = ArithmeticStructures::getTranslationMatrix(shiftX, shiftY, shiftZ);
+			sO.setSphereScaling(ArithmeticStructures::getScalingMatrix(scaleX, scaleY, scaleZ));
+			expectedTransformation = ArithmeticStructures::getScalingMatrix(scaleX, scaleY, scaleZ);
 			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(expectedTransformation, sO.getSphereScaling()));
 		}
 
-		TEST_METHOD(Ray_ScaledSphereIntersectionTest)
+		TEST_METHOD(SceneObject_ScaledSphereIntersectionTest)
 		{
 			const ArithmeticStructures::HomogenousCoordinates origin{ 0.0,0.0,-5.0,1.0 };
 			const ArithmeticStructures::HomogenousCoordinates direction{ 0.0,0.0,1.0,0.0 };
@@ -963,6 +963,30 @@ namespace TDDRaytracerUnitTests
 			// first check whether all expected intersections have been found
 			Assert::IsTrue(expectedIntersections.size() == actualIntersections.size());
 			// then check whether they are correct
+			Assert::AreEqual(expectedIntersections.at(0), actualIntersections.at(0), 0.0001f);
+			Assert::AreEqual(expectedIntersections.at(1), actualIntersections.at(1), 0.0001f);
+		}
+
+		TEST_METHOD(SceneObject_TranslatedSphereIntersectionTest)
+		{
+			const ArithmeticStructures::HomogenousCoordinates origin{ 0.0,0.0,-5.0,1.0 };
+			const ArithmeticStructures::HomogenousCoordinates direction{ 0.0,0.0,1.0,0.0 };
+			Ray ray{ origin, direction };
+
+			constexpr float shift_x{ 5.0 }, shift_y{ 0.0 }, shift_z{ 0.0 };
+
+			const ArithmeticStructures::HomogenousCoordinates sphere_Origin{ 0.0,0.0,0.0,1.0 };
+			constexpr int sphere_Radius{ 1 };
+			GeometricStructures::Sphere sphere{ sphere_Origin, sphere_Radius };
+			SceneObject sO{ sphere };
+			sO.setSphereTranslation(ArithmeticStructures::getTranslationMatrix(shift_x, shift_y, shift_z));
+
+			SceneObject::Intersections expectedIntersections{};
+			expectedIntersections.at(0) = SceneObject::Invalid;
+			expectedIntersections.at(1) = SceneObject::Invalid;
+
+			SceneObject::Intersections actualIntersections{ sO.getSphereIntersections(ray) };
+			// no intersections expected
 			Assert::AreEqual(expectedIntersections.at(0), actualIntersections.at(0), 0.0001f);
 			Assert::AreEqual(expectedIntersections.at(1), actualIntersections.at(1), 0.0001f);
 		}
