@@ -917,13 +917,19 @@ namespace TDDRaytracerUnitTests
 		}
 
 
-		TEST_METHOD(Ray_SceneObjectTransformationTest)
+		TEST_METHOD(SceneObject_TransformationTest)
 		{
 			const ArithmeticStructures::HomogenousCoordinates sphere_Origin{ 0.0,0.0,0.0,1.0 };
 			constexpr int sphere_Radius{ 1 };
 			GeometricStructures::Sphere sphere{ sphere_Origin, sphere_Radius };
 			SceneObject sO{ sphere };
 			ArithmeticStructures::Matrix4x4 expectedTransformation{ ArithmeticStructures::getIdentityMatrix() };
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(expectedTransformation, sO.getSphereTransformation()));
+
+			constexpr float shiftX{ 2.0 }, shiftY{ 3.0 }, shiftZ{ 4.0 };
+
+			sO.setSphereTransformation(ArithmeticStructures::getTranslationMatrix(shiftX, shiftY, shiftZ));
+			expectedTransformation = ArithmeticStructures::getTranslationMatrix(shiftX, shiftY, shiftZ);
 			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(expectedTransformation, sO.getSphereTransformation()));
 		}
 
