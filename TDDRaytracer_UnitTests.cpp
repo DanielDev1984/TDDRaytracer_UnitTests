@@ -933,13 +933,13 @@ namespace TDDRaytracerUnitTests
 			GeometricStructures::Sphere sphere{ sphere_Origin, sphere_Radius };
 			SceneObject sO{ sphere };
 			ArithmeticStructures::Matrix4x4 expectedTransformation{ ArithmeticStructures::getIdentityMatrix() };
-			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(expectedTransformation, sO.getSphereTransformation()));
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(expectedTransformation, sO.getSphereScaling()));
 
 			constexpr float shiftX{ 2.0 }, shiftY{ 3.0 }, shiftZ{ 4.0 };
 
-			sO.setSphereTransformation(ArithmeticStructures::getTranslationMatrix(shiftX, shiftY, shiftZ));
+			sO.setSphereScaling(ArithmeticStructures::getTranslationMatrix(shiftX, shiftY, shiftZ));
 			expectedTransformation = ArithmeticStructures::getTranslationMatrix(shiftX, shiftY, shiftZ);
-			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(expectedTransformation, sO.getSphereTransformation()));
+			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(expectedTransformation, sO.getSphereScaling()));
 		}
 
 		TEST_METHOD(Ray_ScaledSphereIntersectionTest)
@@ -954,7 +954,7 @@ namespace TDDRaytracerUnitTests
 			constexpr int sphere_Radius{ 1 };
 			GeometricStructures::Sphere sphere{ sphere_Origin, sphere_Radius };
 			SceneObject sO{ sphere };
-			sO.setSphereTransformation(ArithmeticStructures::getScalingMatrix(scale_x, scale_y, scale_z));
+			sO.setSphereScaling(ArithmeticStructures::getScalingMatrix(scale_x, scale_y, scale_z));
 
 			// expect the ray to intersect with the scaled sphere two times. once on sphere entry, and afterwards while exiting the sphere
 			SceneObject::Intersections expectedIntersections{ 3.0,7.0 };
