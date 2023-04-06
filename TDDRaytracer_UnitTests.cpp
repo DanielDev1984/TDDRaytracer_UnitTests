@@ -942,31 +942,30 @@ namespace TDDRaytracerUnitTests
 			Assert::IsTrue(ArithmeticStructures::matricesAreEqual_4x4(expectedTransformation, sO.getSphereTransformation()));
 		}
 
-		//TEST_METHOD(Ray_ScaledSphereIntersectionTest)
-		//{
-		//	Assert::Fail();
-		//	const ArithmeticStructures::HomogenousCoordinates origin{ 0.0,0.0,-5.0,1.0 };
-		//	const ArithmeticStructures::HomogenousCoordinates direction{ 0.0,0.0,1.0,0.0 };
-		//	Ray ray{ origin, direction };
+		TEST_METHOD(Ray_ScaledSphereIntersectionTest)
+		{
+			const ArithmeticStructures::HomogenousCoordinates origin{ 0.0,0.0,-5.0,1.0 };
+			const ArithmeticStructures::HomogenousCoordinates direction{ 0.0,0.0,1.0,0.0 };
+			Ray ray{ origin, direction };
 
-		//	constexpr float scale_x{ 2.0 }, scale_y{ 2.0 }, scale_z{ 2.0 };
+			constexpr float scale_x{ 2.0 }, scale_y{ 2.0 }, scale_z{ 2.0 };
 
-		//	const ArithmeticStructures::HomogenousCoordinates sphere_Origin{ 0.0,0.0,0.0,1.0 };
-		//	constexpr int sphere_Radius{ 1 };
-		//	GeometricStructures::Sphere sphere{ sphere_Origin, sphere_Radius };
-		//	SceneObject sO{ sphere };
-		//	sO.setSphereTransformation(ArithmeticStructures::getScalingMatrix(scale_x, scale_y, scale_z));
+			const ArithmeticStructures::HomogenousCoordinates sphere_Origin{ 0.0,0.0,0.0,1.0 };
+			constexpr int sphere_Radius{ 1 };
+			GeometricStructures::Sphere sphere{ sphere_Origin, sphere_Radius };
+			SceneObject sO{ sphere };
+			sO.setSphereTransformation(ArithmeticStructures::getScalingMatrix(scale_x, scale_y, scale_z));
 
-		//	// expect the ray to intersect with the scaled sphere two times. once on sphere entry, and afterwards while exiting the sphere
-		//	SceneObject::Intersections expectedIntersections{ 3.0,7.0 };
+			// expect the ray to intersect with the scaled sphere two times. once on sphere entry, and afterwards while exiting the sphere
+			SceneObject::Intersections expectedIntersections{ 3.0,7.0 };
 
-		//	SceneObject::Intersections actualIntersections{ sO.getSphereIntersections(ray) };
-		//	// first check whether all expected intersections have been found
-		//	Assert::IsTrue(expectedIntersections.size() == actualIntersections.size());
-		//	// then check whether they are correct
-		//	/*Assert::AreEqual(expectedIntersections.at(0), actualIntersections.at(0), 3.0001f);
-		//	Assert::AreEqual(expectedIntersections.at(1), actualIntersections.at(1), 7.0001f);*/
-		//}
+			SceneObject::Intersections actualIntersections{ sO.getSphereIntersections(ray) };
+			// first check whether all expected intersections have been found
+			Assert::IsTrue(expectedIntersections.size() == actualIntersections.size());
+			// then check whether they are correct
+			Assert::AreEqual(expectedIntersections.at(0), actualIntersections.at(0), 0.0001f);
+			Assert::AreEqual(expectedIntersections.at(1), actualIntersections.at(1), 0.0001f);
+		}
 
 		TEST_METHOD(SceneObject_SphereIntersectionTest)
 		{
