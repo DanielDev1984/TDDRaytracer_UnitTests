@@ -1095,6 +1095,20 @@ namespace TDDRaytracerUnitTests
 			Assert::IsTrue(std::isnan(actualHit));
 		}
 
+		TEST_METHOD(SceneObject_SphereNormalTest)
+		{
+			const ArithmeticStructures::HomogenousCoordinates sphere_Origin{ 0.0,0.0,0.0,1.0 };
+			constexpr int sphere_Radius{ 1 };
+			GeometricStructures::Sphere sphere{ sphere_Origin, sphere_Radius };
+			SceneObject sO{ sphere };
+
+			ArithmeticStructures::HomogenousCoordinates expectedNormal{ 1.0,0.0,0.0,0.0 };
+			ArithmeticStructures::HomogenousCoordinates pointOnSphereSurface{ 1.0,0.0,0.0,1.0 };
+			ArithmeticStructures::HomogenousCoordinates calculatedNormal{ sO.getNormalOnSphereSurfaceAt(pointOnSphereSurface) };
+			
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedNormal, calculatedNormal));
+		}
+
 		TEST_METHOD(Canvas_DimTest)
 		{
 			constexpr int xDim{ 256 }, yDim{ 354 };
