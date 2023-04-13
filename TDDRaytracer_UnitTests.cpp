@@ -1104,9 +1104,31 @@ namespace TDDRaytracerUnitTests
 
 			ArithmeticStructures::HomogenousCoordinates expectedNormal{ 1.0,0.0,0.0,0.0 };
 			ArithmeticStructures::HomogenousCoordinates pointOnSphereSurface{ 1.0,0.0,0.0,1.0 };
-			ArithmeticStructures::HomogenousCoordinates calculatedNormal{ sO.getNormalOnSphereSurfaceAt(pointOnSphereSurface) };
+			ArithmeticStructures::HomogenousCoordinates calculatedNormal{ sO.getNormalOnUnitSphereSurfaceAt(pointOnSphereSurface) };
 			
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedNormal, calculatedNormal));
+
+			expectedNormal = ArithmeticStructures::HomogenousCoordinates( 0.0,1.0,0.0,0.0 );
+			pointOnSphereSurface = ArithmeticStructures::HomogenousCoordinates( 0.0,1.0,0.0,1.0 );
+			calculatedNormal = sO.getNormalOnUnitSphereSurfaceAt(pointOnSphereSurface) ;
+
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedNormal, calculatedNormal));
+
+			const auto surfacePointCoordinate{ sqrt(3.0) / 3.0 };
+
+			expectedNormal = ArithmeticStructures::HomogenousCoordinates(surfacePointCoordinate, surfacePointCoordinate, surfacePointCoordinate, 0.0);
+			pointOnSphereSurface = ArithmeticStructures::HomogenousCoordinates(surfacePointCoordinate, surfacePointCoordinate, surfacePointCoordinate, 1.0);
+			calculatedNormal = sO.getNormalOnUnitSphereSurfaceAt(pointOnSphereSurface);
+
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedNormal, calculatedNormal));
+
+			// test whether the returned normal really is a unitvector
+			ArithmeticStructures aS;
+			auto [x, y, z, w] = calculatedNormal;
+			aS.setVector(x,y,z);
+
+
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(calculatedNormal, aS.getNormalizedVector()));
 		}
 
 		TEST_METHOD(Canvas_DimTest)
