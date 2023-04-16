@@ -1131,6 +1131,27 @@ namespace TDDRaytracerUnitTests
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(calculatedNormal, aS.getNormalizedVector()));
 		}
 
+		TEST_METHOD(SceneObject_TransformedSphereNormalTest)
+		{
+			const ArithmeticStructures::HomogenousCoordinates sphere_Origin{ 0.0,0.0,0.0,1.0 };
+			constexpr int sphere_Radius{ 1 };
+			GeometricStructures::Sphere sphere{ sphere_Origin, sphere_Radius };
+			SceneObject sO{ sphere };
+
+			constexpr float shift_x{ 0.0 }, shift_y{ 1.0 }, shift_z{ 0.0 };
+
+			sO.setSphereTranslation(ArithmeticStructures::getTranslationMatrix(shift_x, shift_y, shift_z));
+
+
+
+			ArithmeticStructures::HomogenousCoordinates expectedNormal{ 0.0,0.70711,-0.70711,0.0 };
+			ArithmeticStructures::HomogenousCoordinates pointOnSphereSurface{ 0.0,1.70711,-0.70711,1.0 };
+
+			ArithmeticStructures::HomogenousCoordinates calculatedNormal{ sO.getNormalOnUnitSphereSurfaceAt(pointOnSphereSurface) };
+
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedNormal, calculatedNormal));
+		}
+
 		TEST_METHOD(Canvas_DimTest)
 		{
 			constexpr int xDim{ 256 }, yDim{ 354 };
