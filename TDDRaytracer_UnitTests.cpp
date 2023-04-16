@@ -1104,13 +1104,13 @@ namespace TDDRaytracerUnitTests
 
 			ArithmeticStructures::HomogenousCoordinates expectedNormal{ 1.0,0.0,0.0,0.0 };
 			ArithmeticStructures::HomogenousCoordinates pointOnSphereSurface{ 1.0,0.0,0.0,1.0 };
-			ArithmeticStructures::HomogenousCoordinates calculatedNormal{ sO.getNormalOnUnitSphereSurfaceAt(pointOnSphereSurface) };
+			ArithmeticStructures::HomogenousCoordinates calculatedNormal{ sO.getNormalOnSphereSurfaceAt(pointOnSphereSurface) };
 			
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedNormal, calculatedNormal));
 
 			expectedNormal = ArithmeticStructures::HomogenousCoordinates( 0.0,1.0,0.0,0.0 );
 			pointOnSphereSurface = ArithmeticStructures::HomogenousCoordinates( 0.0,1.0,0.0,1.0 );
-			calculatedNormal = sO.getNormalOnUnitSphereSurfaceAt(pointOnSphereSurface) ;
+			calculatedNormal = sO.getNormalOnSphereSurfaceAt(pointOnSphereSurface) ;
 
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedNormal, calculatedNormal));
 
@@ -1118,7 +1118,7 @@ namespace TDDRaytracerUnitTests
 
 			expectedNormal = ArithmeticStructures::HomogenousCoordinates(surfacePointCoordinate, surfacePointCoordinate, surfacePointCoordinate, 0.0);
 			pointOnSphereSurface = ArithmeticStructures::HomogenousCoordinates(surfacePointCoordinate, surfacePointCoordinate, surfacePointCoordinate, 1.0);
-			calculatedNormal = sO.getNormalOnUnitSphereSurfaceAt(pointOnSphereSurface);
+			calculatedNormal = sO.getNormalOnSphereSurfaceAt(pointOnSphereSurface);
 
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedNormal, calculatedNormal));
 
@@ -1147,7 +1147,7 @@ namespace TDDRaytracerUnitTests
 			ArithmeticStructures::HomogenousCoordinates expectedNormal{ 0.0,0.70711,-0.70711,0.0 };
 			ArithmeticStructures::HomogenousCoordinates pointOnSphereSurface{ 0.0,1.70711,-0.70711,1.0 };
 
-			ArithmeticStructures::HomogenousCoordinates calculatedNormal{ sO.getNormalOnUnitSphereSurfaceAt(pointOnSphereSurface) };
+			ArithmeticStructures::HomogenousCoordinates calculatedNormal{ sO.getNormalOnSphereSurfaceAt(pointOnSphereSurface) };
 
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedNormal, calculatedNormal));
 		}
