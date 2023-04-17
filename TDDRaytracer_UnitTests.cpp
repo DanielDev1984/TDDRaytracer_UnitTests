@@ -1137,18 +1137,29 @@ namespace TDDRaytracerUnitTests
 			constexpr int sphere_Radius{ 1 };
 			GeometricStructures::Sphere sphere{ sphere_Origin, sphere_Radius };
 			SceneObject sO{ sphere };
-
+			// first only check translation...
 			constexpr float shift_x{ 0.0 }, shift_y{ 1.0 }, shift_z{ 0.0 };
 
-			sO.setSphereTranslation(ArithmeticStructures::getTranslationMatrix(shift_x, shift_y, shift_z));
-
-
-
+			sO.setSphereTransformation(ArithmeticStructures::getTranslationMatrix(shift_x, shift_y, shift_z));
 			ArithmeticStructures::HomogenousCoordinates expectedNormal{ 0.0,0.70711,-0.70711,0.0 };
 			ArithmeticStructures::HomogenousCoordinates pointOnSphereSurface{ 0.0,1.70711,-0.70711,1.0 };
 
 			ArithmeticStructures::HomogenousCoordinates calculatedNormal{ sO.getNormalOnSphereSurfaceAt(pointOnSphereSurface) };
 
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedNormal, calculatedNormal));
+
+			// ... then full fledged transformation
+			constexpr float scale_x{ 1.0 }, scale_y{ 0.5 }, scale_z{ 1.0 }, rot_z{M_PI / 5.0};
+
+			const auto scalingMatrix{ ArithmeticStructures::getScalingMatrix(scale_x, scale_y, scale_z) };
+			const auto rotationMatrix{ ArithmeticStructures::getRotationMatrix_ZAxis(rot_z) };
+
+			const auto transformationMatrix{ ArithmeticStructures::multiplyMatrices(scalingMatrix, rotationMatrix) };
+
+			pointOnSphereSurface = ArithmeticStructures::HomogenousCoordinates{0.0, M_SQRT2*0.5, -M_SQRT2 * 0.5 , 1.0};
+			sO.setSphereTransformation(transformationMatrix);
+			calculatedNormal = sO.getNormalOnSphereSurfaceAt(pointOnSphereSurface);			
+			expectedNormal = ArithmeticStructures::HomogenousCoordinates{ 0.0,0.97014,-0.24254,0.0 };
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedNormal, calculatedNormal));
 		}
 
