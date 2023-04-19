@@ -1163,6 +1163,21 @@ namespace TDDRaytracerUnitTests
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedNormal, calculatedNormal));
 		}
 
+		TEST_METHOD(SceneObject_VectorReflectionTest)
+		{
+			const ArithmeticStructures::HomogenousCoordinates sphere_Origin{ 0.0,0.0,0.0,1.0 };
+			constexpr int sphere_Radius{ 1 };
+			GeometricStructures::Sphere sphere{ sphere_Origin, sphere_Radius };
+			SceneObject sO{ sphere };
+			ArithmeticStructures::HomogenousCoordinates inVec{ 1.0,-1.0,0.0,0.0 };
+			ArithmeticStructures::HomogenousCoordinates normal{ 0.0,1.0,0.0,0.0 };
+			ArithmeticStructures::HomogenousCoordinates expectedReflectedVec{ 1.0,1.0,0.0,0.0 };
+
+			ArithmeticStructures::HomogenousCoordinates calculatedReflectedVec{ sO.getReflectedVectorAroundNormal(inVec, normal) };
+
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedReflectedVec, calculatedReflectedVec));
+		}
+
 		TEST_METHOD(Canvas_DimTest)
 		{
 			constexpr int xDim{ 256 }, yDim{ 354 };
