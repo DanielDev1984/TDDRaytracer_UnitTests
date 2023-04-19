@@ -1169,12 +1169,20 @@ namespace TDDRaytracerUnitTests
 			constexpr int sphere_Radius{ 1 };
 			GeometricStructures::Sphere sphere{ sphere_Origin, sphere_Radius };
 			SceneObject sO{ sphere };
+			// reflection on horizontal surface
 			ArithmeticStructures::HomogenousCoordinates inVec{ 1.0,-1.0,0.0,0.0 };
 			ArithmeticStructures::HomogenousCoordinates normal{ 0.0,1.0,0.0,0.0 };
 			ArithmeticStructures::HomogenousCoordinates expectedReflectedVec{ 1.0,1.0,0.0,0.0 };
-
+			
 			ArithmeticStructures::HomogenousCoordinates calculatedReflectedVec{ sO.getReflectedVectorAroundNormal(inVec, normal) };
 
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedReflectedVec, calculatedReflectedVec));
+
+			// reflection on 45° tilted surface
+			inVec = ArithmeticStructures::HomogenousCoordinates{ 0.0,-1.0,0.0,0.0 };
+			normal = ArithmeticStructures::HomogenousCoordinates{ M_SQRT2 * 0.5,M_SQRT2 * 0.5,0.0,0.0 };
+			expectedReflectedVec = ArithmeticStructures::HomogenousCoordinates{ 1.0,0.0,0.0,0.0 };
+			calculatedReflectedVec = sO.getReflectedVectorAroundNormal(inVec, normal) ;
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedReflectedVec, calculatedReflectedVec));
 		}
 
