@@ -1131,6 +1131,27 @@ namespace TDDRaytracerUnitTests
 
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(calculatedNormal, aS.getNormalizedVector()));
 		}
+		TEST_METHOD(SceneObject_SphereMaterialTest)
+		{
+			const ArithmeticStructures::HomogenousCoordinates sphere_Origin{ 0.0,0.0,0.0,1.0 };
+			constexpr int sphere_Radius{ 1 };
+			GeometricStructures::Sphere sphere{ sphere_Origin, sphere_Radius };
+			SceneObject sO{ sphere };
+			const Material expecterMaterial{ Material() };
+			// expect the sphere material to be the init material
+			Assert::AreEqual(expecterMaterial.getAmbientReflectionFactor() , sO.getSphereMaterial().getAmbientReflectionFactor());
+			Assert::AreEqual(expecterMaterial.getDiffuseReflectionFactor(), sO.getSphereMaterial().getDiffuseReflectionFactor());
+			Assert::AreEqual(expecterMaterial.getSpecularReflectionFactor(), sO.getSphereMaterial().getSpecularReflectionFactor());
+			Assert::AreEqual(expecterMaterial.getShininessFactor(), sO.getSphereMaterial().getShininessFactor());
+
+			// expect the sphere material to be the copied material
+			constexpr float expected_ambientFactor{ 0.1 }, expected_diffuseFactor{ 0.9 }, expected_specularFactor{ 0.9 }, expected_shininessFactor{ 200.0 };
+			sO.setSphereMaterial(Material{ expected_ambientFactor, expected_diffuseFactor, expected_specularFactor, expected_shininessFactor });
+			Assert::AreEqual(expected_ambientFactor, sO.getSphereMaterial().getAmbientReflectionFactor());
+			Assert::AreEqual(expected_diffuseFactor, sO.getSphereMaterial().getDiffuseReflectionFactor());
+			Assert::AreEqual(expected_specularFactor, sO.getSphereMaterial().getSpecularReflectionFactor());
+			Assert::AreEqual(expected_shininessFactor, sO.getSphereMaterial().getShininessFactor());
+		}
 
 		TEST_METHOD(SceneObject_TransformedSphereNormalTest)
 		{
@@ -1210,7 +1231,7 @@ namespace TDDRaytracerUnitTests
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(lightSourcePosition, lS.getPosition()));
 		}
 
-		TEST_METHOD(SceneObject_MaterialInitTest)
+		TEST_METHOD(Material_MaterialInitTest)
 		{
 			constexpr float ambientFactor{ 0.1 }, diffuseFactor{ 0.9 }, specularFactor{ 0.9 }, shininessFactor{ 200.0 };
 			Material material{ ambientFactor, diffuseFactor, specularFactor, shininessFactor };
@@ -1218,6 +1239,19 @@ namespace TDDRaytracerUnitTests
 			Assert::AreEqual(diffuseFactor, material.getDiffuseReflectionFactor());
 			Assert::AreEqual(specularFactor, material.getSpecularReflectionFactor());
 			Assert::AreEqual(shininessFactor, material.getShininessFactor());
+		}
+
+		TEST_METHOD(Material_AssignmentTest)
+		{
+			constexpr float ambientFactor{ 0.1 }, diffuseFactor{ 0.9 }, specularFactor{ 0.9 }, shininessFactor{ 200.0 };
+			const Material materialToCopy{ ambientFactor, diffuseFactor, specularFactor, shininessFactor };
+			Material materialToChange{ Material() };
+			materialToChange = materialToCopy;
+
+			Assert::AreEqual(materialToCopy.getAmbientReflectionFactor(), materialToChange.getAmbientReflectionFactor());
+			Assert::AreEqual(materialToCopy.getDiffuseReflectionFactor(), materialToChange.getDiffuseReflectionFactor());
+			Assert::AreEqual(materialToCopy.getSpecularReflectionFactor(), materialToChange.getSpecularReflectionFactor());
+			Assert::AreEqual(materialToCopy.getShininessFactor(), materialToChange.getShininessFactor());
 		}
 
 		TEST_METHOD(Canvas_DimTest)
