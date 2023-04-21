@@ -1200,6 +1200,15 @@ namespace TDDRaytracerUnitTests
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedReflectedVec, calculatedReflectedVec));
 		}
 
+		TEST_METHOD(SceneObject_LightSourceInitTest)
+		{
+			const ArithmeticStructures::HomogenousCoordinates lightSourceIntensity{1.0,1.0,1.0,1.0};
+			const ArithmeticStructures::HomogenousCoordinates lightSourcePosition{ 0.0,0.0,0.0,1.0 };
+			SceneObject::LightSource lS{ lightSourceIntensity, lightSourcePosition };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(lightSourceIntensity,lS.getIntensity()));
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(lightSourcePosition, lS.getPosition()));
+		}
+
 		TEST_METHOD(Canvas_DimTest)
 		{
 			constexpr int xDim{ 256 }, yDim{ 354 };
