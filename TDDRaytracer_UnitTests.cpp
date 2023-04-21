@@ -1184,6 +1184,20 @@ namespace TDDRaytracerUnitTests
 			expectedReflectedVec = ArithmeticStructures::HomogenousCoordinates{ 1.0,0.0,0.0,0.0 };
 			calculatedReflectedVec = sO.getReflectedVectorAroundNormal(inVec, normal) ;
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedReflectedVec, calculatedReflectedVec));
+
+			// reflection for ray being parallel to normal
+			inVec = ArithmeticStructures::HomogenousCoordinates{ 0.0,-1.0,0.0,0.0 };
+			normal = ArithmeticStructures::HomogenousCoordinates{ 0.0,1.0,0.0,0.0 };
+			expectedReflectedVec = ArithmeticStructures::HomogenousCoordinates{ 0.0,1.0,0.0,0.0 };
+			calculatedReflectedVec = sO.getReflectedVectorAroundNormal(inVec, normal);
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedReflectedVec, calculatedReflectedVec));
+
+			// reflection for ray being perpendicular to normal
+			inVec = ArithmeticStructures::HomogenousCoordinates{ -1.0,0.0,0.0,0.0 };
+			normal = ArithmeticStructures::HomogenousCoordinates{ 0.0,1.0,0.0,0.0 };
+			expectedReflectedVec = ArithmeticStructures::HomogenousCoordinates{ -1.0,0.0,0.0,0.0 };
+			calculatedReflectedVec = sO.getReflectedVectorAroundNormal(inVec, normal);
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedReflectedVec, calculatedReflectedVec));
 		}
 
 		TEST_METHOD(Canvas_DimTest)
