@@ -3,6 +3,7 @@
 #include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\ArithmeticStructures.h"
 #include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\GeometricStructures.h"
 #include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\SceneObject.h"
+#include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\Material.h"
 #include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\Ray.h"
 #include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\Canvas.h"
 #include "C:\Users\strai\source\TDD_raytracer\TDD_Raytracer\PPMWriter.h"
@@ -1207,6 +1208,16 @@ namespace TDDRaytracerUnitTests
 			SceneObject::LightSource lS{ lightSourceIntensity, lightSourcePosition };
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(lightSourceIntensity,lS.getIntensity()));
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(lightSourcePosition, lS.getPosition()));
+		}
+
+		TEST_METHOD(SceneObject_MaterialInitTest)
+		{
+			constexpr float ambientFactor{ 0.1 }, diffuseFactor{ 0.9 }, specularFactor{ 0.9 }, shininessFactor{ 200.0 };
+			Material material{ ambientFactor, diffuseFactor, specularFactor, shininessFactor };
+			Assert::AreEqual(ambientFactor, material.getAmbientReflectionFactor());
+			Assert::AreEqual(diffuseFactor, material.getDiffuseReflectionFactor());
+			Assert::AreEqual(specularFactor, material.getSpecularReflectionFactor());
+			Assert::AreEqual(shininessFactor, material.getShininessFactor());
 		}
 
 		TEST_METHOD(Canvas_DimTest)
