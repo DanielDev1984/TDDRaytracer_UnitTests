@@ -1231,6 +1231,28 @@ namespace TDDRaytracerUnitTests
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(lightSourcePosition, lS.getPosition()));
 		}
 
+		TEST_METHOD(SceneObject_PhongShadingTest)
+		{
+			const ArithmeticStructures::HomogenousCoordinates sphere_Origin{ 0.0,0.0,0.0,1.0 };
+			constexpr int sphere_Radius{ 1 };
+			GeometricStructures::Sphere sphere{ sphere_Origin, sphere_Radius };
+			SceneObject sO{ sphere };
+			const ArithmeticStructures::HomogenousCoordinates lightSourceIntensity{ 1.0,1.0,1.0,1.0 };
+			const ArithmeticStructures::HomogenousCoordinates lightSourcePosition{ 0.0,0.0,-10.0,1.0 };
+			SceneObject::LightSource lS{ lightSourceIntensity, lightSourcePosition };
+			constexpr float ambientFactor{ 0.1 }, diffuseFactor{ 0.9 }, specularFactor{ 0.9 }, shininessFactor{ 200.0 };
+			Material m{ ambientFactor, diffuseFactor, specularFactor, shininessFactor };
+			sO.setSphereMaterial(m);
+			constexpr ArithmeticStructures::HomogenousCoordinates pointOnSurface{0.0,0.0,0.0,1.0};
+			constexpr ArithmeticStructures::HomogenousCoordinates normalVector{ 0.0,0.0,-1.0,0.0 };
+			ArithmeticStructures::HomogenousCoordinates eyeVector{0.0,0.0,-1.0,0.0};
+			ArithmeticStructures::HomogenousCoordinates expectedSurfaceColor{1.9,1.9,1.9,1.0};
+
+			auto calculatedSurfaceColor{ sO.getPhongShadedSurfaceColor(m, lS, pointOnSurface, normalVector, eyeVector) };
+
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedSurfaceColor, calculatedSurfaceColor));
+		}
+
 		TEST_METHOD(Material_MaterialInitTest)
 		{
 			constexpr float ambientFactor{ 0.1 }, diffuseFactor{ 0.9 }, specularFactor{ 0.9 }, shininessFactor{ 200.0 };
