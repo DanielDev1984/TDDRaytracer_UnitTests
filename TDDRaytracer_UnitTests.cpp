@@ -1227,10 +1227,10 @@ namespace TDDRaytracerUnitTests
 
 		TEST_METHOD(SceneObject_LightSourceInitTest)
 		{
-			const ArithmeticStructures::HomogenousCoordinates lightSourceIntensity{1.0,1.0,1.0,1.0};
+			const ArithmeticStructures::HomogenousCoordinates lightSourceColor{1.0,1.0,1.0,1.0};
 			const ArithmeticStructures::HomogenousCoordinates lightSourcePosition{ 0.0,0.0,0.0,1.0 };
-			SceneObject::LightSource lS{ lightSourceIntensity, lightSourcePosition };
-			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(lightSourceIntensity,lS.getIntensity()));
+			SceneObject::LightSource lS{ lightSourceColor, lightSourcePosition };
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(lightSourceColor,lS.getColor()));
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(lightSourcePosition, lS.getPosition()));
 		}
 
@@ -1240,6 +1240,7 @@ namespace TDDRaytracerUnitTests
 			constexpr int sphere_Radius{ 1 };
 			GeometricStructures::Sphere sphere{ sphere_Origin, sphere_Radius };
 			SceneObject sO{ sphere };
+			// light, normal and eyevector are parallel
 			const ArithmeticStructures::HomogenousCoordinates lightSourceIntensity{ 1.0,1.0,1.0,1.0 };
 			const ArithmeticStructures::HomogenousCoordinates lightSourcePosition{ 0.0,0.0,-10.0,1.0 };
 			SceneObject::LightSource lS{ lightSourceIntensity, lightSourcePosition };
@@ -1254,6 +1255,34 @@ namespace TDDRaytracerUnitTests
 
 			auto calculatedSurfaceColor{ sO.getPhongShadedSurfaceColor(m, lS, pointOnSurface, normalVector, eyeVector) };
 
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedSurfaceColor, calculatedSurfaceColor));
+
+			// light amd normal are parallel, eye vector is angulated towards them
+			constexpr float sqrt2Half{ M_SQRT2 * 0.5 };
+			eyeVector = ArithmeticStructures::HomogenousCoordinates{ 0.0, sqrt2Half, -sqrt2Half, 0.0 };
+			expectedSurfaceColor = ArithmeticStructures::HomogenousCoordinates{ 1.0,1.0,1.0,1.0 };
+			calculatedSurfaceColor = sO.getPhongShadedSurfaceColor(m, lS, pointOnSurface, normalVector, eyeVector) ;
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedSurfaceColor, calculatedSurfaceColor));
+
+			// eye amd normal are parallel, light vector is angulated towards them
+			eyeVector = ArithmeticStructures::HomogenousCoordinates{ 0.0, 0.0, -1.0, 0.0 };
+			lS.setPosition(ArithmeticStructures::HomogenousCoordinates{ 0.0,10.0,-10.0,1.0 });
+			expectedSurfaceColor = ArithmeticStructures::HomogenousCoordinates{ 0.7364,0.7364,0.7364,1.0 };
+			calculatedSurfaceColor = sO.getPhongShadedSurfaceColor(m, lS, pointOnSurface, normalVector, eyeVector);
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedSurfaceColor, calculatedSurfaceColor));
+
+			// light and eye vector are angulated wrt normal
+			eyeVector = ArithmeticStructures::HomogenousCoordinates{ 0.0, -sqrt2Half, -sqrt2Half, 0.0 };
+			lS.setPosition(ArithmeticStructures::HomogenousCoordinates{ 0.0,10.0,-10.0,1.0 });
+			expectedSurfaceColor = ArithmeticStructures::HomogenousCoordinates{ 1.6364,1.6364,1.6364,1.0 };
+			calculatedSurfaceColor = sO.getPhongShadedSurfaceColor(m, lS, pointOnSurface, normalVector, eyeVector);
+			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedSurfaceColor, calculatedSurfaceColor));
+
+			// eye and normal are parallel, light is behind surfacepoint
+			eyeVector = ArithmeticStructures::HomogenousCoordinates{ 0.0, 0.0, -1.0, 0.0 };
+			lS.setPosition(ArithmeticStructures::HomogenousCoordinates{ 0.0,0.0,10.0,1.0 });
+			expectedSurfaceColor = ArithmeticStructures::HomogenousCoordinates{ 0.1,0.1,0.1,1.0 };
+			calculatedSurfaceColor = sO.getPhongShadedSurfaceColor(m, lS, pointOnSurface, normalVector, eyeVector);
 			Assert::IsTrue(ArithmeticStructures::coordinatesAreEqual(expectedSurfaceColor, calculatedSurfaceColor));
 		}
 
